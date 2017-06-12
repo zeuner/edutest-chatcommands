@@ -9,9 +9,7 @@ minetest.register_privilege(
 minetest.register_chatcommand(
     "list_students",
     {
-        description = core.gettext(
-            "list student player names"
-        ),
+        description = "list student player names",
         func = function(
             param
         )
