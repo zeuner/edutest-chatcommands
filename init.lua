@@ -6,11 +6,23 @@ minetest.register_privilege(
     }
 )
 
+minetest.register_privilege(
+    'teacher',
+    {
+        description = "player can apply bulk commands targeted at students",
+        give_to_singleplayer = false,
+    }
+)
+
 minetest.register_chatcommand(
     "list_students",
     {
         description = "list student player names",
+        privs = {
+            teacher = true,
+        },
         func = function(
+            own_name,
             param
         )
             for _, player in pairs(
@@ -25,8 +37,9 @@ minetest.register_chatcommand(
                 if true == privs[
                     "student"
                 ] then
-                    print(
-                        name
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: found player " .. name
                     )
                 end
             end
