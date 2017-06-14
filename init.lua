@@ -46,3 +46,41 @@ minetest.register_chatcommand(
         end,
     }
 )
+
+minetest.register_chatcommand(
+    "every_student",
+    {
+        description = "apply command to all student players",
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            for _, player in pairs(
+                minetest.get_connected_players(
+                )
+            ) do
+                local name = player:get_player_name(
+                )
+                local privs = minetest.get_player_privs(
+                    name
+                )
+                if true == privs[
+                    "student"
+                ] then
+                    local command = string.gsub(
+                        param,
+                        "subject",
+                        name
+                    )
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: generated command " .. command
+                    )
+                end
+            end
+        end,
+    }
+)
