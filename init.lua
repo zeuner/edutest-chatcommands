@@ -84,3 +84,20 @@ minetest.register_chatcommand(
         end,
     }
 )
+
+minetest.register_on_joinplayer(
+    function (player)
+        local name = player:get_player_name(
+        )
+        local privs = minetest.get_player_privs(
+            name
+        )
+        if true == privs[
+            "student"
+        ] then
+            print(
+                "EDUtest: student joined: " .. name
+            )
+        end
+    end
+)
