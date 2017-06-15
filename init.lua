@@ -63,6 +63,24 @@ local split_command = function(
 end
 
 minetest.register_chatcommand(
+    "student_join_keep_priv",
+    {
+        description = "keep privilege on student join",
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            on_join_handlers[
+                "privilege_" .. param
+            ] = nil
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "student_join_revoke",
     {
         description = "revoke privilege on student join",
