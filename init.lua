@@ -169,7 +169,9 @@ minetest.register_on_joinplayer(
             print(
                 "EDUtest: student joined: " .. name
             )
-            for k, v in on_join_handlers do
+            for k, v in pairs(
+                on_join_handlers
+            ) do
                 if nil ~= v.func then
                     v.func(
                         player,
