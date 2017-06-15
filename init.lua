@@ -63,6 +63,36 @@ local split_command = function(
 end
 
 minetest.register_chatcommand(
+    "student_join_revoke",
+    {
+        description = "revoke privilege on student join",
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            on_join_handlers[
+                "privilege_" .. param
+            ] = {
+                func = function(
+                    player,
+                    name
+                )
+                    minetest.chatcommands[
+                        "revoke"
+                    ].func(
+                        own_name,
+                        name .. " " .. param
+                    )
+                end,
+            }
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "student_join_grant",
     {
         description = "grant privilege on student join",
@@ -85,9 +115,6 @@ minetest.register_chatcommand(
                     ].func(
                         own_name,
                         name .. " " .. param
-                    )
-                    print(
-                        "EDUtest: on join grant " .. param .. " to " .. name
                     )
                 end,
             }
@@ -166,9 +193,6 @@ minetest.register_on_joinplayer(
         if true == privs[
             "student"
         ] then
-            print(
-                "EDUtest: student joined: " .. name
-            )
             for k, v in pairs(
                 on_join_handlers
             ) do
