@@ -37,6 +37,28 @@ local for_all_students = function(
     end
 end
 
+local split_command = function(
+    command_string
+)
+    local delimiter = ""
+    local params = ""
+    local command
+    local first = true
+    for argument in string.gmatch(
+        command_string,
+        "[^ ]+"
+    ) do
+        if first then
+            command = argument
+            first = false
+        else
+            params = params .. delimiter .. argument
+            delimiter = " "
+        end
+    end
+    return command, params
+end
+
 minetest.register_chatcommand(
     "list_students",
     {
@@ -79,14 +101,16 @@ minetest.register_chatcommand(
                     player,
                     name
                 )
-                    local command = string.gsub(
-                        param,
-                        "subject",
-                        name
+                    local command, params = split_command(
+		        string.gsub(
+                            param,
+                            "subject",
+                            name
+			)
                     )
                     minetest.chat_send_player(
                         own_name,
-                        "EDUtest: generated command " .. command
+                        "EDUtest: generated command " .. command .. " | " .. params
                     )
                 end
             )
