@@ -102,15 +102,17 @@ minetest.register_chatcommand(
                     name
                 )
                     local command, params = split_command(
-		        string.gsub(
+                        string.gsub(
                             param,
                             "subject",
                             name
-			)
+                        )
                     )
-                    minetest.chat_send_player(
+                    minetest.chatcommands[
+                        command
+                    ].func(
                         own_name,
-                        "EDUtest: generated command " .. command .. " | " .. params
+                        params
                     )
                 end
             )
