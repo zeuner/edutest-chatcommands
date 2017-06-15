@@ -14,6 +14,29 @@ minetest.register_privilege(
     }
 )
 
+local for_all_students = function(
+    action
+)
+    for _, player in pairs(
+        minetest.get_connected_players(
+        )
+    ) do
+        local name = player:get_player_name(
+        )
+        local privs = minetest.get_player_privs(
+            name
+        )
+        if true == privs[
+            "student"
+        ] then
+            action(
+                player,
+                name
+            )
+        end
+    end
+end
+
 minetest.register_chatcommand(
     "list_students",
     {
@@ -25,24 +48,17 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for _, player in pairs(
-                minetest.get_connected_players(
-                )
-            ) do
-                local name = player:get_player_name(
-                )
-                local privs = minetest.get_player_privs(
+            for_all_students(
+                function(
+                    player,
                     name
                 )
-                if true == privs[
-                    "student"
-                ] then
                     minetest.chat_send_player(
                         own_name,
                         "EDUtest: found player " .. name
                     )
                 end
-            end
+            )
         end,
     }
 )
@@ -58,18 +74,11 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for _, player in pairs(
-                minetest.get_connected_players(
-                )
-            ) do
-                local name = player:get_player_name(
-                )
-                local privs = minetest.get_player_privs(
+            for_all_students(
+                function(
+                    player,
                     name
                 )
-                if true == privs[
-                    "student"
-                ] then
                     local command = string.gsub(
                         param,
                         "subject",
@@ -80,7 +89,7 @@ minetest.register_chatcommand(
                         "EDUtest: generated command " .. command
                     )
                 end
-            end
+            )
         end,
     }
 )
