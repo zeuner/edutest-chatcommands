@@ -14,6 +14,9 @@ minetest.register_privilege(
     }
 )
 
+local on_join_handlers = {
+}
+
 local for_all_students = function(
     action
 )
@@ -58,6 +61,39 @@ local split_command = function(
     end
     return command, params
 end
+
+minetest.register_chatcommand(
+    "student_join_grant",
+    {
+        description = "grant privilege on student join",
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            on_join_handlers[
+                "privilege_" .. param
+            ] = {
+                func = function(
+                    player,
+                    name
+                )
+                    minetest.chatcommands[
+                        "grant"
+                    ].func(
+                        own_name,
+                        name .. " " .. param
+                    )
+                    print(
+                        "EDUtest: on join grant " .. param .. " to " .. name
+                    )
+                end,
+            }
+        end,
+    }
+)
 
 minetest.register_chatcommand(
     "list_students",
@@ -133,6 +169,14 @@ minetest.register_on_joinplayer(
             print(
                 "EDUtest: student joined: " .. name
             )
+            for k, v in on_join_handlers do
+                if nil ~= v.func then
+                    v.func(
+                        player,
+                        name
+                    )
+                end
+            end
         end
     end
 )
