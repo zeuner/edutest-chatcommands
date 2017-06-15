@@ -224,3 +224,7 @@ minetest.register_on_joinplayer(
         end
     end
 )
+
+edutest = {
+    for_all_students = for_all_students,
+}
