@@ -1,0 +1,8 @@
+found player %s =
+apply command to all student players =
+list student player names =
+grant privilege on student join =
+revoke privilege on student join =
+keep privilege on student join =
+player can apply bulk commands targeted at students =
+player is affected by bulk commands targeted at students =

@@ -1,7 +1,24 @@
+local S
+
+if minetest.get_modpath(
+    "intllib"
+) then
+    S = intllib.Getter(
+    )
+else
+    S = function(
+        translated
+    )
+        return translated
+    end
+end
+
 minetest.register_privilege(
     'student',
     {
-        description = "player is affected by bulk commands targeted at students",
+        description = S(
+            "player is affected by bulk commands targeted at students"
+        ),
         give_to_singleplayer = false,
     }
 )
@@ -9,7 +26,9 @@ minetest.register_privilege(
 minetest.register_privilege(
     'teacher',
     {
-        description = "player can apply bulk commands targeted at students",
+        description = S(
+            "player can apply bulk commands targeted at students"
+        ),
         give_to_singleplayer = false,
     }
 )
@@ -65,7 +84,9 @@ end
 minetest.register_chatcommand(
     "student_join_keep_priv",
     {
-        description = "keep privilege on student join",
+        description = S(
+            "keep privilege on student join"
+        ),
         privs = {
             teacher = true,
         },
@@ -83,7 +104,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_revoke",
     {
-        description = "revoke privilege on student join",
+        description = S(
+            "revoke privilege on student join"
+        ),
         privs = {
             teacher = true,
         },
@@ -113,7 +136,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_grant",
     {
-        description = "grant privilege on student join",
+        description = S(
+            "grant privilege on student join"
+        ),
         privs = {
             teacher = true,
         },
@@ -143,7 +168,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_students",
     {
-        description = "list student player names",
+        description = S(
+            "list student player names"
+        ),
         privs = {
             teacher = true,
         },
@@ -158,7 +185,12 @@ minetest.register_chatcommand(
                 )
                     minetest.chat_send_player(
                         own_name,
-                        "EDUtest: found player " .. name
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found player %s"
+                            ),
+                            name
+                        )
                     )
                 end
             )
@@ -169,7 +201,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "every_student",
     {
-        description = "apply command to all student players",
+        description = S(
+            "apply command to all student players"
+        ),
         privs = {
             teacher = true,
         },
