@@ -1,0 +1,8 @@
+found player %s = Spieler %s gefunden
+apply command to all student players = Kommando auf alle Schüler anwenden
+list student player names = Namen der Schüler anzeigen
+grant privilege on student join = Privileg gewähren, wenn sich ein Schüler anmeldet
+revoke privilege on student join = Privileg entziehen, wenn sich ein Schüler anmeldet
+keep privilege on student join = Privilegstatus beibehalten, wenn sich ein Schüler anmeldet
+player can apply bulk commands targeted at students = Spieler kann Massenkommandos auf alle Schüler anwenden
+player is affected by bulk commands targeted at students = Spieler kann von Massenkommandos zur Spielerverwaltung betroffen werden
