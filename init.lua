@@ -235,6 +235,138 @@ minetest.register_chatcommand(
     }
 )
 
+minetest.register_chatcommand(
+    "visitation",
+    {
+        description = S(
+            "reversibly teleport self or other players"
+        ),
+        privs = {
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local teleportee_name = nil
+            local target = nil
+            teleportee_name, target = string.match(
+                param,
+                "^([^ ]+) +(.+)$"
+            )
+            if not teleportee_name then
+                teleportee_name = own_name
+            end
+            local teleportee = minetest.get_player_by_name(
+                teleportee_name
+            )
+            if not teleportee then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        teleportee_name
+                    )
+                )
+                return
+            end
+            local return_positions = teleportee:get_attribute(
+                "return_positions"
+            )
+            if return_positions then
+                return_positions = minetest.deserialize(
+                    return_positions
+                )
+            end
+            local old_pos = teleportee:get_pos(
+            )
+            teleportee:set_attribute(
+                "return_positions",
+                minetest.serialize(
+                    {
+                        head = old_pos,
+                        tail = return_positions,
+                    }
+                )
+            )
+            minetest.chatcommands[
+                "teleport"
+            ].func(
+                own_name,
+                param
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "return",
+    {
+        description = S(
+            "teleport to location before the last visitation command"
+        ),
+        privs = {
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local teleportee_name = nil
+            if "" == param then
+                teleportee_name = own_name
+            else
+                teleportee_name = param
+            end
+            local teleportee = minetest.get_player_by_name(
+                teleportee_name
+            )
+            if not teleportee then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        teleportee_name
+                    )
+                )
+                return
+            end
+            local return_positions = teleportee:get_attribute(
+                "return_positions"
+            )
+            if return_positions then
+                return_positions = minetest.deserialize(
+                    return_positions
+                )
+            end
+            if not return_positions then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "no previous position stored"
+                    )
+                )
+                return
+            end
+            local old_pos = return_positions.head
+            teleportee:set_attribute(
+                "return_positions",
+                minetest.serialize(
+                    return_positions.tail
+                )
+            )
+            minetest.chatcommands[
+                "teleport"
+            ].func(
+                own_name,
+                teleportee_name .. " " .. old_pos.x .. "," .. old_pos.y .. "," .. old_pos.z
+            )
+        end,
+    }
+)
+
 minetest.register_on_joinplayer(
     function (player)
         local name = player:get_player_name(

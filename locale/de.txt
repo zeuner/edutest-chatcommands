@@ -6,3 +6,4 @@ revoke privilege on student join = Privileg entziehen, wenn sich ein Schüler an
 keep privilege on student join = Privilegstatus beibehalten, wenn sich ein Schüler anmeldet
 player can apply bulk commands targeted at students = Spieler kann Massenkommandos auf alle Schüler anwenden
 player is affected by bulk commands targeted at students = Spieler kann von Massenkommandos zur Spielerverwaltung betroffen werden
+reversibly teleport self or other players = Sich selbst oder andere Spieler umkehrbar teleportieren
