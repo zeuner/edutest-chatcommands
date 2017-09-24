@@ -59,6 +59,90 @@ local for_all_students = function(
     end
 end
 
+local digtime = 42
+local caps = {
+    times = {
+        digtime,
+        digtime,
+        digtime
+    },
+    uses = 0,
+    maxlevel = 256
+}
+
+minetest.register_item(
+    "edutest_chatcommands:creative_hand",
+    {
+        type = "none",
+        wield_image = "wieldhand.png",
+        wield_scale = {
+            x = 1,
+            y = 1,
+            z = 2.5
+        },
+        range = 10,
+        tool_capabilities = {
+            full_punch_interval = 0.5,
+            max_drop_level = 3,
+            groupcaps = {
+                crumbly = caps,
+                cracky  = caps,
+                snappy  = caps,
+                choppy  = caps,
+                oddly_breakable_by_hand = caps,
+            },
+            damage_groups = {
+                fleshy = 10
+            },
+        }
+    }
+)
+
+minetest.register_item(
+    "edutest_chatcommands:basic_hand",
+    {
+        type = "none",
+        wield_image = "wieldhand.png",
+        wield_scale = {
+            x = 1,
+            y = 1,
+            z = 2.5
+        },
+        tool_capabilities = {
+            full_punch_interval = 0.9,
+            max_drop_level = 0,
+            groupcaps = {
+                crumbly = {
+                    times={
+                        [2] = 3.00,
+                        [3] = 0.70
+                    },
+                    uses = 0,
+                    maxlevel = 1
+                },
+                snappy = {
+                    times={
+                        [3] = 0.40
+                    },
+                    uses = 0,
+                    maxlevel = 1
+                },
+                oddly_breakable_by_hand = {
+                    times = {
+                        [1] = 3.50,
+                        [2] = 2.00,
+                        [3] = 0.70
+                    },
+                    uses = 0
+                }
+            },
+            damage_groups = {
+                fleshy = 1
+            },
+        }
+    }
+)
+
 local split_command = function(
     command_string
 )
@@ -80,6 +164,102 @@ local split_command = function(
     end
     return command, params
 end
+
+minetest.register_chatcommand(
+    "creative_hand",
+    {
+        description = S(
+            "set the empty hand of a player to creative mode characteristics"
+        ),
+        privs = {
+	    privs = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local name = nil
+            if "" == param then
+                name = own_name
+            else
+                name = param
+            end
+            local player = minetest.get_player_by_name(
+                name
+            )
+            if not player then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        name
+                    )
+                )
+                return
+            end
+	    player:get_inventory(
+	    ):remove_item(
+	        "hand",
+                "edutest_chatcommands:basic_hand"
+	    )
+	    player:get_inventory(
+	    ):add_item(
+	        "hand",
+                "edutest_chatcommands:creative_hand"
+	    )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "basic_hand",
+    {
+        description = S(
+            "set the empty hand of a player to survival mode characteristics"
+        ),
+        privs = {
+	    privs = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local name = nil
+            if "" == param then
+                name = own_name
+            else
+                name = param
+            end
+            local player = minetest.get_player_by_name(
+                name
+            )
+            if not player then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        name
+                    )
+                )
+                return
+            end
+	    player:get_inventory(
+	    ):remove_item(
+	        "hand",
+                "edutest_chatcommands:creative_hand"
+	    )
+	    player:get_inventory(
+	    ):add_item(
+	        "hand",
+                "edutest_chatcommands:basic_hand"
+	    )
+        end,
+    }
+)
 
 minetest.register_chatcommand(
     "student_join_keep_priv",
