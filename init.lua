@@ -60,6 +60,7 @@ local for_all_students = function(
 end
 
 local digtime = 42
+
 local caps = {
     times = {
         digtime,
@@ -143,6 +144,26 @@ minetest.register_item(
     }
 )
 
+local player_block_position = function(
+    name
+)
+    local pos = minetest.get_player_by_name(
+        name
+    ):getpos(
+    )
+    return {
+        x = math.floor(
+            pos.x + 0.5
+        ),
+        y = math.floor(
+            pos.y + 0.5
+        ),
+        z = math.floor(
+            pos.z + 0.5
+        ),
+    }
+end
+
 local split_command = function(
     command_string
 )
@@ -165,6 +186,302 @@ local split_command = function(
     return command, params
 end
 
+local active_marker = nil
+
+minetest.register_entity(
+    ":edutest:highlight_marker",
+    {
+        initial_properties = {
+            visual = "upright_sprite",
+            textures = {
+                "area_highlight_hex.png"
+            },
+            physical = false,
+        },
+        on_step = function(
+            self,
+            dtime
+        )
+            if not active_marker then
+                self.object:remove(
+                )
+            end
+        end,
+    }
+)
+
+local player_highlighted = {
+}
+
+local player_markers = {
+}
+
+local highlight_positions = function(
+    name
+)
+    active_marker = 1
+    local pos1 = player_highlighted[
+        name
+    ].pos1
+    local pos2 = player_highlighted[
+        name
+    ].pos2
+    local pos = {
+    }
+    for _, extreme in ipairs(
+        {
+            "min",
+            "max",
+        }
+    ) do
+        pos[
+            extreme
+        ] = {
+        }
+        for k, v in pairs(
+            pos1
+        ) do
+            pos[
+                extreme
+            ][
+                k
+            ] = math[
+                extreme
+            ](
+                v,
+                pos2[
+                    k
+                ]
+            )
+        end
+    end
+    local markers = {
+    }
+    for _, axis in ipairs(
+        {
+            {
+                displacement = "z",
+                range = "x",
+                rotation = 0,
+            },
+            {
+                displacement = "x",
+                range = "z",
+                rotation = math.pi / 2,
+            },
+        }
+    ) do
+        for _, displaced in ipairs(
+            {
+                pos.min[
+                    axis.displacement
+                ] - 0.5,
+                pos.max[
+                    axis.displacement
+                ] + 0.5,
+            }
+        ) do
+            local marker_pos = {
+                x = (
+                    pos.min.x + pos.max.x
+                ) / 2,
+                y = (
+                    pos.min.y + pos.max.y
+                ) / 2,
+                z = (
+                    pos.min.z + pos.max.z
+                ) / 2,
+            }
+            marker_pos[
+                axis.displacement
+            ] = displaced
+            local marker = minetest.add_entity(
+                marker_pos,
+                "edutest:highlight_marker"
+            )
+            marker:set_yaw(
+                axis.rotation
+            )
+            marker:set_properties(
+                {
+                    visual_size = {
+                        x = pos.max[
+                            axis.range
+                        ] - pos.min[
+                            axis.range
+                        ] + 1,
+                        y = pos.max.y - pos.min.y + 1,
+                    }
+                }
+            )
+            markers[
+                axis.displacement .. displaced
+            ] = marker
+        end
+    end
+    if player_markers[
+        name
+    ] then
+        for k, v in pairs(
+            player_markers[
+                name
+            ]
+        ) do
+            v:remove(
+            )
+        end
+    end
+    player_markers[
+        name
+    ] = markers
+end
+
+minetest.register_chatcommand(
+    "highlight_pos1",
+    {
+        description = S(
+            "set position 1 of the highlighted area"
+        ),
+        privs = {
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local pos = player_block_position(
+                own_name
+            )
+            if not player_highlighted[
+                own_name
+            ] then
+                player_highlighted[
+                    own_name
+                ] = {
+                }
+            end
+            player_highlighted[
+                own_name
+            ].pos1 = pos
+            if not player_highlighted[
+                own_name
+            ].pos2 then
+                player_highlighted[
+                    own_name
+                ].pos2 = player_highlighted[
+                    own_name
+                ].pos1
+            end
+            highlight_positions(
+                own_name
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
+    "highlight_pos2",
+    {
+        description = S(
+            "set position 2 of the highlighted area"
+        ),
+        privs = {
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local pos = player_block_position(
+                own_name
+            )
+            if not player_highlighted[
+                own_name
+            ] then
+                player_highlighted[
+                    own_name
+                ] = {
+                }
+            end
+            player_highlighted[
+                own_name
+            ].pos2 = pos
+            if not player_highlighted[
+                own_name
+            ].pos1 then
+                player_highlighted[
+                    own_name
+                ].pos1 = player_highlighted[
+                    own_name
+                ].pos2
+            end
+            highlight_positions(
+                own_name
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
+    "highlight_areas",
+    {
+        description = S(
+            "apply areas command on highlighted area"
+        ),
+        privs = {
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if not player_highlighted[
+                own_name
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no area highlighted yet"
+                        )
+                    )
+                )
+		return
+            end
+            minetest.chatcommands[
+                "area_pos1"
+            ].func(
+                own_name,
+                player_highlighted[
+                    own_name
+		].pos1.x .. " " .. player_highlighted[
+                    own_name
+		].pos1.y .. " " .. player_highlighted[
+                    own_name
+		].pos1.z
+            )
+            minetest.chatcommands[
+                "area_pos2"
+            ].func(
+                own_name,
+                player_highlighted[
+                    own_name
+		].pos2.x .. " " .. player_highlighted[
+                    own_name
+		].pos2.y .. " " .. player_highlighted[
+                    own_name
+		].pos2.z
+            )
+            local command, params = split_command(
+                param
+            )
+            minetest.chatcommands[
+                command
+            ].func(
+                own_name,
+                params
+            )
+        end
+    }
+)
+
 minetest.register_chatcommand(
     "creative_hand",
     {
@@ -172,7 +489,7 @@ minetest.register_chatcommand(
             "set the empty hand of a player to creative mode characteristics"
         ),
         privs = {
-	    privs = true,
+            privs = true,
         },
         func = function(
             own_name,
@@ -199,16 +516,16 @@ minetest.register_chatcommand(
                 )
                 return
             end
-	    player:get_inventory(
-	    ):remove_item(
-	        "hand",
+            player:get_inventory(
+            ):remove_item(
+                "hand",
                 "edutest_chatcommands:basic_hand"
-	    )
-	    player:get_inventory(
-	    ):add_item(
-	        "hand",
+            )
+            player:get_inventory(
+            ):add_item(
+                "hand",
                 "edutest_chatcommands:creative_hand"
-	    )
+            )
         end,
     }
 )
@@ -220,7 +537,7 @@ minetest.register_chatcommand(
             "set the empty hand of a player to survival mode characteristics"
         ),
         privs = {
-	    privs = true,
+            privs = true,
         },
         func = function(
             own_name,
@@ -247,16 +564,16 @@ minetest.register_chatcommand(
                 )
                 return
             end
-	    player:get_inventory(
-	    ):remove_item(
-	        "hand",
+            player:get_inventory(
+            ):remove_item(
+                "hand",
                 "edutest_chatcommands:creative_hand"
-	    )
-	    player:get_inventory(
-	    ):add_item(
-	        "hand",
+            )
+            player:get_inventory(
+            ):add_item(
+                "hand",
                 "edutest_chatcommands:basic_hand"
-	    )
+            )
         end,
     }
 )
