@@ -13,18 +13,18 @@ else
     end
 end
 
-minetest.register_privilege(
-    'student',
-    {
-        description = S(
-            "player is affected by bulk commands targeted at students"
-        ),
-        give_to_singleplayer = false,
-    }
-)
+--~minetest.register_privilege(
+    --~ 'student',
+    --~ {
+        --~ description = S(
+            --~ "player is affected by bulk commands targeted at students"
+        --~ ),
+        --~ give_to_singleplayer = false,
+    --~ }
+--~)
 
 minetest.register_privilege(
-    'teacher',
+    'instructor',
     {
         description = S(
             "player can apply bulk commands targeted at students"
@@ -48,9 +48,7 @@ local for_all_students = function(
         local privs = minetest.get_player_privs(
             name
         )
-        if true == privs[
-            "student"
-        ] then
+        if not privs["instructor"] or false == privs["instructor"] then
             action(
                 player,
                 name
@@ -88,7 +86,7 @@ minetest.register_chatcommand(
             "keep privilege on student join"
         ),
         privs = {
-            teacher = true,
+            instructor = true,
         },
         func = function(
             own_name,
@@ -108,7 +106,7 @@ minetest.register_chatcommand(
             "revoke privilege on student join"
         ),
         privs = {
-            teacher = true,
+            instructor = true,
         },
         func = function(
             own_name,
@@ -140,7 +138,7 @@ minetest.register_chatcommand(
             "grant privilege on student join"
         ),
         privs = {
-            teacher = true,
+            instructor = true,
         },
         func = function(
             own_name,
@@ -172,7 +170,7 @@ minetest.register_chatcommand(
             "list student player names"
         ),
         privs = {
-            teacher = true,
+            instructor = true,
         },
         func = function(
             own_name,
@@ -205,7 +203,7 @@ minetest.register_chatcommand(
             "apply command to all student players"
         ),
         privs = {
-            teacher = true,
+            instructor = true,
         },
         func = function(
             own_name,
@@ -235,6 +233,70 @@ minetest.register_chatcommand(
     }
 )
 
+minetest.register_chatcommand(
+	"heal",
+	{
+		params = "<name>",
+		description = S("set player's health to 20 HP"),
+		privs = {instructor = true},
+		func = function(self, name)
+			if minetest.setting_getbool("enable_damage") == true then
+				local ppl = minetest.get_player_by_name(name)
+				if not ppl then
+					return
+				end
+				ppl:set_hp(20)
+				minetest.chat_send_player(name, "You were healed.")
+			end
+		end,
+	}
+)
+
+minetest.register_chatcommand(
+	"announce",
+	{
+		params = "<name> <message>",
+		description = S("send a message in a popup"),
+		privs = {instructor = true},
+		func = function(self, namessage)
+			local annText, annLine, annTemp, annName, mesg
+			local bgcolor = '#dd4444cc'
+			local maxlinewidth = 50
+			mesg = minetest.formspec_escape(namessage)
+			for word in mesg:gmatch("%S+") do
+				if annName then
+					if annLine then
+						annTemp = annLine .. " " .. word
+					else
+						annTemp = word
+					end
+					if #annTemp < maxlinewidth then
+						annLine = annTemp
+					else
+						-- wrap text
+						annText = (annText or "") .. annLine .. "\n"
+						annLine = word
+					end
+				else
+					annName = word
+				end
+			end
+			if annLine then
+				annText = (annText or "") .. annLine
+				local annFormspec = "size[8,2]bgcolor[" .. bgcolor .. "]label[1,0;" .. annText .. "]button_exit[0,0;1,1;okb;OK]"
+				if minetest.get_player_by_name(annName) then
+					minetest.show_formspec(annName, "annForm", annFormspec)
+					return true
+				else
+					return false, "Player does not exist"
+				end
+			else
+				return false, "Announcement text is empty"
+			end
+		end,
+	}
+)
+
 minetest.register_on_joinplayer(
     function (player)
         local name = player:get_player_name(
@@ -242,9 +304,7 @@ minetest.register_on_joinplayer(
         local privs = minetest.get_player_privs(
             name
         )
-        if true == privs[
-            "student"
-        ] then
+        if not privs["instructor"] or false == privs["instructor"] then
             for k, v in pairs(
                 on_join_handlers
             ) do
