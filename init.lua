@@ -219,6 +219,56 @@ local player_markers = {
 local player_groups = {
 }
 
+local storage = minetest.get_mod_storage(
+)
+
+for group in string.gmatch(
+    storage:get_string(
+        "player_groups"
+    ),
+    "[^ ]+"
+) do
+    if "" ~= group then
+        player_groups[
+            group
+        ] = {
+        }
+    end
+end
+
+for group, v in pairs(
+    player_groups
+) do
+    for player in string.gmatch(
+        storage:get_string(
+            "player_group_" .. group
+        ),
+        "[^ ]+"
+    ) do
+        if "" ~= player then
+            player_groups[
+                group
+            ][
+                player
+            ] = 1
+        end
+    end
+end
+
+local collapse_keys = function(
+    collapsed
+)
+    local delimiter = ""
+    local list = ""
+    for k, v in pairs(
+        collapsed
+    ) do
+        list = list .. delimiter .. k
+        delimiter = " "
+    end
+    return list
+end
+
 local highlight_positions = function(
     name
 )
@@ -379,6 +429,12 @@ minetest.register_chatcommand(
                 name
             ] = {
             }
+            storage:set_string(
+                "player_groups",
+                collapse_keys(
+                    player_groups
+                )
+            )
             minetest.chat_send_player(
                 own_name,
                 "EDUtest: " .. string.format(
@@ -431,6 +487,12 @@ minetest.register_chatcommand(
             player_groups[
                 name
             ] = nil
+            storage:set_string(
+                "player_groups",
+                collapse_keys(
+                    player_groups
+                )
+            )
             minetest.chat_send_player(
                 own_name,
                 "EDUtest: " .. string.format(
@@ -528,6 +590,14 @@ minetest.register_chatcommand(
             ][
                 player
             ] = 1
+            storage:set_string(
+                "player_group_" .. group,
+                collapse_keys(
+                    player_groups[
+                        group
+                    ]
+                )
+            )
             minetest.chat_send_player(
                 own_name,
                 "EDUtest: " .. string.format(
@@ -626,6 +696,14 @@ minetest.register_chatcommand(
             ][
                 player
             ] = nil
+            storage:set_string(
+                "player_group_" .. group,
+                collapse_keys(
+                    player_groups[
+                        group
+                    ]
+                )
+            )
             minetest.chat_send_player(
                 own_name,
                 "EDUtest: " .. string.format(
