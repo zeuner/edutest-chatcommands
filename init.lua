@@ -269,6 +269,19 @@ local collapse_keys = function(
     return list
 end
 
+local for_all_groups = function(
+    action
+)
+    for name, content in pairs(
+        player_groups
+    ) do
+        action(
+            name,
+            content
+        )
+    end
+end
+
 local for_all_members = function(
     group,
     action
@@ -1109,26 +1122,29 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for name, players in pairs(
-                player_groups
-            ) do
-                local count = 0
-                for k, v in pairs(
+            for_all_groups(
+                function(
+                    name,
                     players
-                ) do
-                    count = count + 1
-                end
-                minetest.chat_send_player(
-                    own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "found group %s (player count %d)"
-                        ),
-                        name,
-                        count
-                    )
                 )
-            end
+                    local count = 0
+                    for k, v in pairs(
+                        players
+                    ) do
+                        count = count + 1
+                    end
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found group %s (player count %d)"
+                            ),
+                            name,
+                            count
+                        )
+                    )
+               end
+            )
         end,
     }
 )
@@ -1427,4 +1443,5 @@ minetest.register_on_joinplayer(
 edutest = {
     for_all_students = for_all_students,
     for_all_members = for_all_members,
+    for_all_groups = for_all_groups,
 }
