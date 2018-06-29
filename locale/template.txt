@@ -27,3 +27,5 @@ player does not belong to the group =
 player %s removed from group named %s =
 list group member names =
 apply command to all group members =
+list group names =
+found group %s =

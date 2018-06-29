@@ -27,3 +27,5 @@ player does not belong to the group = Der Spieler gehört nicht zur Gruppe
 player %s removed from group named %s = Spieler %s wurde aus Gruppe %s entfernt
 list group member names = Namen der Gruppenmitglieder anzeigen
 apply command to all group members = Kommando auf alle Gruppenmitglieder anwenden
+list group names = Namen der Gruppen anzeigen
+found group %s = Gruppe %s gefunden

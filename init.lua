@@ -1097,6 +1097,36 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "list_groups",
+    {
+        description = S(
+            "list group names"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            for name, v in pairs(
+                player_groups
+            ) do
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "found group %s"
+                        ),
+                        name
+                    )
+                )
+            end
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "list_members",
     {
         description = S(
