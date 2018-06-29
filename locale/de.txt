@@ -25,3 +25,5 @@ player %s added to group named %s = Spieler %s wurde zur Gruppe %s hinzugefügt
 remove a player from a group = Entferne einen Spieler aus einer Gruppe
 player does not belong to the group = Der Spieler gehört nicht zur Gruppe
 player %s removed from group named %s = Spieler %s wurde aus Gruppe %s entfernt
+list group member names = Namen der Gruppenmitglieder anzeigen
+apply command to all group members = Kommando auf alle Gruppenmitglieder anwenden

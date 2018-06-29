@@ -269,6 +269,25 @@ local collapse_keys = function(
     return list
 end
 
+local for_all_members = function(
+    group,
+    action
+)
+    for name, v in pairs(
+        player_groups[
+            group
+        ]
+    ) do
+        local player = minetest.get_player_by_name(
+            name
+        )
+        action(
+            player,
+            name
+        )
+    end
+end
+
 local highlight_positions = function(
     name
 )
@@ -1078,6 +1097,52 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "list_members",
+    {
+        description = S(
+            "list group member names"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local group = param
+            if not player_groups[
+                group
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            for_all_members(
+                group,
+                function(
+                    player,
+                    name
+                )
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found player %s"
+                            ),
+                            name
+                        )
+                    )
+                end
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "every_student",
     {
         description = S(
@@ -1091,6 +1156,58 @@ minetest.register_chatcommand(
             param
         )
             for_all_students(
+                function(
+                    player,
+                    name
+                )
+                    local command, params = split_command(
+                        string.gsub(
+                            param,
+                            "subject",
+                            name
+                        )
+                    )
+                    minetest.chatcommands[
+                        command
+                    ].func(
+                        own_name,
+                        params
+                    )
+                end
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "every_member",
+    {
+        description = S(
+            "apply command to all group members"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local group, param = split_command(
+                param
+            )
+            if not player_groups[
+                group
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            for_all_members(
+                group,
                 function(
                     player,
                     name
@@ -1272,4 +1389,5 @@ minetest.register_on_joinplayer(
 
 edutest = {
     for_all_students = for_all_students,
+    for_all_members = for_all_members,
 }
