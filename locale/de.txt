@@ -28,4 +28,4 @@ player %s removed from group named %s = Spieler %s wurde aus Gruppe %s entfernt
 list group member names = Namen der Gruppenmitglieder anzeigen
 apply command to all group members = Kommando auf alle Gruppenmitglieder anwenden
 list group names = Namen der Gruppen anzeigen
-found group %s = Gruppe %s gefunden
+found group %s (player count %d) = Gruppe %s (Spieleranzahl %d) gefunden

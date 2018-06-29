@@ -1109,16 +1109,23 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for name, v in pairs(
+            for name, players in pairs(
                 player_groups
             ) do
+                local count = 0
+                for k, v in pairs(
+                    players
+                ) do
+                    count = count + 1
+                end
                 minetest.chat_send_player(
                     own_name,
                     "EDUtest: " .. string.format(
                         S(
-                            "found group %s"
+                            "found group %s (player count %d)"
                         ),
-                        name
+                        name,
+                        count
                     )
                 )
             end
