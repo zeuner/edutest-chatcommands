@@ -188,6 +188,24 @@ end
 
 local active_marker = nil
 
+local highlight_marker_click_handler = function(
+    self,
+    clicker
+)
+    print(
+        "EDUtest DEBUG: on_rightclick default handler called"
+    )
+end
+
+local set_highlight_marker_click_handler = function(
+    handler
+)
+    print(
+        "EDUtest DEBUG: on_rightclick custom handler set"
+    )
+    highlight_marker_click_handler = handler
+end
+
 minetest.register_entity(
     ":edutest:highlight_marker",
     {
@@ -206,6 +224,18 @@ minetest.register_entity(
                 self.object:remove(
                 )
             end
+        end,
+        on_rightclick = function(
+            self,
+            clicker
+        )
+            print(
+                "EDUtest DEBUG: on_rightclick called"
+            )
+            return highlight_marker_click_handler(
+                self,
+                clicker
+            )
         end,
     }
 )
@@ -889,5 +919,6 @@ minetest.register_on_joinplayer(
 )
 
 edutest = {
+    set_highlight_marker_click_handler = set_highlight_marker_click_handler,
     for_all_students = for_all_students,
 }
