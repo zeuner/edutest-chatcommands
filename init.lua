@@ -427,6 +427,56 @@ local highlight_positions = function(
     ] = markers
 end
 
+local adapt_highlighted_area = function(
+    name,
+    axis,
+    extreme,
+    adjustment
+)
+    local selected_value = math[
+        extreme
+    ](
+        player_highlighted[
+            name
+        ].pos1[
+            axis
+        ],
+        player_highlighted[
+            name
+        ].pos2[
+            axis
+        ]
+    )
+    local selected_edge = nil
+    for edge, coordinates in pairs(
+        player_highlighted[
+            name
+        ]
+    ) do
+        if selected_value == coordinates[
+            axis
+        ] then
+            selected_edge = edge
+        end
+    end
+    player_highlighted[
+        name
+    ][
+        selected_edge
+    ][
+        axis
+    ] = player_highlighted[
+        name
+    ][
+        selected_edge
+    ][
+        axis
+    ] + adjustment
+    highlight_positions(
+        name
+    )
+end
+
 minetest.register_chatcommand(
     "highlight_pos1",
     {
@@ -980,6 +1030,7 @@ minetest.register_on_joinplayer(
 )
 
 edutest = {
+    adapt_highlighted_area = adapt_highlighted_area,
     set_highlight_marker_click_handler = set_highlight_marker_click_handler,
     for_all_students = for_all_students,
 }
