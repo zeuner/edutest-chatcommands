@@ -192,52 +192,83 @@ local highlight_marker_click_handler = function(
     self,
     clicker
 )
-    print(
-        "EDUtest DEBUG: on_rightclick default handler called"
-    )
 end
 
 local set_highlight_marker_click_handler = function(
     handler
 )
-    print(
-        "EDUtest DEBUG: on_rightclick custom handler set"
-    )
     highlight_marker_click_handler = handler
 end
 
-minetest.register_entity(
-    ":edutest:highlight_marker",
-    {
-        initial_properties = {
-            visual = "upright_sprite",
-            textures = {
-                "area_highlight_hex.png"
-            },
-            physical = false,
-        },
-        on_step = function(
-            self,
-            dtime
+local entity_selection_box = "selectionbox"
+
+(
+    function(
+    )
+        local version = minetest.get_version(
         )
-            if not active_marker then
-                self.object:remove(
-                )
-            end
-        end,
-        on_rightclick = function(
+        local components = {
+        }
+        for w in (
+            version.string .. "."
+        ):gmatch(
+            "([^.]*)[.]"
+        ) do
+            table.insert(
+                components,
+                w
+            )
+        end
+        local numeric = 0
+        local significance = 1000000
+        for n, w in ipairs(
+            components
+        ) do
+            numeric = numeric + significance * w
+            significance = math.floor(
+                (
+                    significance / 100
+                ) + 0.5
+            )
+        end
+        if 50000 > numeric then
+            entity_selection_box = "collisionbox"
+        end
+    end
+)(
+)
+
+local marker_properties = {
+    initial_properties = {
+        visual = "upright_sprite",
+        textures = {
+            "area_highlight_hex.png"
+        },
+        physical = false,
+    },
+    on_step = function(
+        self,
+        dtime
+    )
+        if not active_marker then
+            self.object:remove(
+            )
+        end
+    end,
+    on_rightclick = function(
+        self,
+        clicker
+    )
+        return highlight_marker_click_handler(
             self,
             clicker
         )
-            print(
-                "EDUtest DEBUG: on_rightclick called"
-            )
-            return highlight_marker_click_handler(
-                self,
-                clicker
-            )
-        end,
-    }
+    end,
+}
+
+minetest.register_entity(
+    ":edutest:highlight_marker",
+    marker_properties
 )
 
 local player_highlighted = {
@@ -332,17 +363,47 @@ local highlight_positions = function(
             marker:set_yaw(
                 axis.rotation
             )
+            local selection_sizes = {
+            }
+            selection_sizes[
+                axis.range
+            ] = 0.5 * (
+                pos.max[
+                    axis.range
+                ] - pos.min[
+                    axis.range
+                ] + 1
+            )
+            selection_sizes[
+                axis.displacement
+            ] = 0.1
+            selection_sizes[
+                "y"
+            ] = 0.5 * (
+                pos.max.y - pos.min.y + 1
+            )
+            local marker_properties = {
+                visual_size = {
+                    x = pos.max[
+                        axis.range
+                    ] - pos.min[
+                        axis.range
+                    ] + 1,
+                    y = pos.max.y - pos.min.y + 1,
+                },
+            }
+            marker_properties[
+                entity_selection_box
+            ] = {
+                -1.0 * selection_sizes.x,
+                -1.0 * selection_sizes.y,
+                -1.0 * selection_sizes.z,
+                selection_sizes.x,
+                selection_sizes.y,
+                selection_sizes.z,
+            }
             marker:set_properties(
-                {
-                    visual_size = {
-                        x = pos.max[
-                            axis.range
-                        ] - pos.min[
-                            axis.range
-                        ] + 1,
-                        y = pos.max.y - pos.min.y + 1,
-                    }
-                }
+                marker_properties
             )
             markers[
                 axis.displacement .. displaced
