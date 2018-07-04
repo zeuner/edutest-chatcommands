@@ -264,6 +264,7 @@ local marker_properties = {
             clicker
         )
     end,
+    range = nil,
 }
 
 minetest.register_entity(
@@ -402,6 +403,8 @@ local highlight_positions = function(
                 selection_sizes.y,
                 selection_sizes.z,
             }
+            marker:get_luaentity(
+            ).range = axis.range
             marker:set_properties(
                 marker_properties
             )
