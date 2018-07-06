@@ -272,6 +272,14 @@ minetest.register_entity(
     marker_properties
 )
 
+local set_highlight_marker_tooltip = function(
+    tooltip
+)
+    minetest.registered_entities[
+        "edutest:highlight_marker"
+    ].initial_properties.infotext = tooltip
+end
+
 local player_highlighted = {
 }
 
@@ -1035,5 +1043,6 @@ minetest.register_on_joinplayer(
 edutest = {
     adapt_highlighted_area = adapt_highlighted_area,
     set_highlight_marker_click_handler = set_highlight_marker_click_handler,
+    set_highlight_marker_tooltip = set_highlight_marker_tooltip,
     for_all_students = for_all_students,
 }
