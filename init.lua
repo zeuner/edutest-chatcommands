@@ -572,6 +572,42 @@ minetest.register_chatcommand(
     }
 )
 
+local highlighted_areas = function(
+    player_name
+)
+    if not player_highlighted[
+        player_name
+    ] then
+        return nil
+    end
+    local center = {
+        x = (
+            player_highlighted[
+                player_name
+            ].pos1.x + player_highlighted[
+                player_name
+            ].pos2.x
+        ) / 2.0,
+        y = (
+            player_highlighted[
+                player_name
+            ].pos1.y + player_highlighted[
+                player_name
+            ].pos2.y
+        ) / 2.0,
+        z = (
+            player_highlighted[
+                player_name
+            ].pos1.z + player_highlighted[
+                player_name
+            ].pos2.z
+        ) / 2.0,
+    }
+    return areas:getAreasAtPos(
+        center
+    )
+end
+
 minetest.register_chatcommand(
     "highlight_areas",
     {
@@ -595,7 +631,7 @@ minetest.register_chatcommand(
                         )
                     )
                 )
-		return
+                return
             end
             minetest.chatcommands[
                 "area_pos1"
@@ -603,11 +639,11 @@ minetest.register_chatcommand(
                 own_name,
                 player_highlighted[
                     own_name
-		].pos1.x .. " " .. player_highlighted[
+                ].pos1.x .. " " .. player_highlighted[
                     own_name
-		].pos1.y .. " " .. player_highlighted[
+                ].pos1.y .. " " .. player_highlighted[
                     own_name
-		].pos1.z
+                ].pos1.z
             )
             minetest.chatcommands[
                 "area_pos2"
@@ -615,11 +651,11 @@ minetest.register_chatcommand(
                 own_name,
                 player_highlighted[
                     own_name
-		].pos2.x .. " " .. player_highlighted[
+                ].pos2.x .. " " .. player_highlighted[
                     own_name
-		].pos2.y .. " " .. player_highlighted[
+                ].pos2.y .. " " .. player_highlighted[
                     own_name
-		].pos2.z
+                ].pos2.z
             )
             local command, params = split_command(
                 param
@@ -1041,6 +1077,7 @@ minetest.register_on_joinplayer(
 )
 
 edutest = {
+    highlighted_areas = highlighted_areas,
     adapt_highlighted_area = adapt_highlighted_area,
     set_highlight_marker_click_handler = set_highlight_marker_click_handler,
     set_highlight_marker_tooltip = set_highlight_marker_tooltip,
