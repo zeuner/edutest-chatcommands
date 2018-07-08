@@ -286,6 +286,91 @@ local player_highlighted = {
 local player_markers = {
 }
 
+local player_groups = {
+}
+
+local storage = minetest.get_mod_storage(
+)
+
+for group in string.gmatch(
+    storage:get_string(
+        "player_groups"
+    ),
+    "[^ ]+"
+) do
+    if "" ~= group then
+        player_groups[
+            group
+        ] = {
+        }
+    end
+end
+
+for group, v in pairs(
+    player_groups
+) do
+    for player in string.gmatch(
+        storage:get_string(
+            "player_group_" .. group
+        ),
+        "[^ ]+"
+    ) do
+        if "" ~= player then
+            player_groups[
+                group
+            ][
+                player
+            ] = 1
+        end
+    end
+end
+
+local collapse_keys = function(
+    collapsed
+)
+    local delimiter = ""
+    local list = ""
+    for k, v in pairs(
+        collapsed
+    ) do
+        list = list .. delimiter .. k
+        delimiter = " "
+    end
+    return list
+end
+
+local for_all_groups = function(
+    action
+)
+    for name, content in pairs(
+        player_groups
+    ) do
+        action(
+            name,
+            content
+        )
+    end
+end
+
+local for_all_members = function(
+    group,
+    action
+)
+    for name, v in pairs(
+        player_groups[
+            group
+        ]
+    ) do
+        local player = minetest.get_player_by_name(
+            name
+        )
+        action(
+            player,
+            name
+        )
+    end
+end
+
 local highlight_positions = function(
     name
 )
@@ -487,6 +572,335 @@ local adapt_highlighted_area = function(
         name
     )
 end
+
+minetest.register_chatcommand(
+    "create_group",
+    {
+        description = S(
+            "create a group of players"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local name = nil
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group name must be specified"
+                    )
+                )
+                return
+            else
+                name = param
+            end
+            if player_groups[
+                name
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group already exists"
+                    )
+                )
+                return
+            end
+            player_groups[
+                name
+            ] = {
+            }
+            storage:set_string(
+                "player_groups",
+                collapse_keys(
+                    player_groups
+                )
+            )
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. string.format(
+                    S(
+                        "group named %s created"
+                    ),
+                    name
+                )
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
+    "delete_group",
+    {
+        description = S(
+            "delete a group of players"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local name = nil
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group name must be specified"
+                    )
+                )
+                return
+            else
+                name = param
+            end
+            if not player_groups[
+                name
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            player_groups[
+                name
+            ] = nil
+            storage:set_string(
+                "player_groups",
+                collapse_keys(
+                    player_groups
+                )
+            )
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. string.format(
+                    S(
+                        "group named %s deleted"
+                    ),
+                    name
+                )
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
+    "enter_group",
+    {
+        description = S(
+            "add a player to a group"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local player = nil
+            local group = nil
+            local first = true
+            for argument in string.gmatch(
+                param,
+                "[^ ]+"
+            ) do
+                if player then
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. S(
+                            "too many parameters given"
+                        )
+                    )
+                    return
+                end
+                if first then
+                    group = argument
+                    first = false
+                else
+                    player = argument
+                    local name = nil
+                end
+            end
+            if not group then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group name must be specified"
+                    )
+                )
+                return
+            end
+            if not player then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "player name must be specified"
+                    )
+                )
+                return
+            end
+            if not player_groups[
+                group
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            if player_groups[
+                group
+            ][
+                player
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "player already belongs to the group"
+                    )
+                )
+                return
+            end
+            player_groups[
+                group
+            ][
+                player
+            ] = 1
+            storage:set_string(
+                "player_group_" .. group,
+                collapse_keys(
+                    player_groups[
+                        group
+                    ]
+                )
+            )
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. string.format(
+                    S(
+                        "player %s added to group named %s"
+                    ),
+                    player,
+                    group
+                )
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
+    "leave_group",
+    {
+        description = S(
+            "remove a player from a group"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local player = nil
+            local group = nil
+            local first = true
+            for argument in string.gmatch(
+                param,
+                "[^ ]+"
+            ) do
+                if player then
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. S(
+                            "too many parameters given"
+                        )
+                    )
+                    return
+                end
+                if first then
+                    group = argument
+                    first = false
+                else
+                    player = argument
+                    local name = nil
+                end
+            end
+            if not group then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group name must be specified"
+                    )
+                )
+                return
+            end
+            if not player then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "player name must be specified"
+                    )
+                )
+                return
+            end
+            if not player_groups[
+                group
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            if not player_groups[
+                group
+            ][
+                player
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "player does not belong to the group"
+                    )
+                )
+                return
+            end
+            player_groups[
+                group
+            ][
+                player
+            ] = nil
+            storage:set_string(
+                "player_group_" .. group,
+                collapse_keys(
+                    player_groups[
+                        group
+                    ]
+                )
+            )
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. string.format(
+                    S(
+                        "player %s removed from group named %s"
+                    ),
+                    player,
+                    group
+                )
+            )
+        end
+    }
+)
 
 minetest.register_chatcommand(
     "highlight_pos1",
@@ -884,6 +1298,92 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "list_groups",
+    {
+        description = S(
+            "list group names"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            for_all_groups(
+                function(
+                    name,
+                    players
+                )
+                    local count = 0
+                    for k, v in pairs(
+                        players
+                    ) do
+                        count = count + 1
+                    end
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found group %s (player count %d)"
+                            ),
+                            name,
+                            count
+                        )
+                    )
+               end
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "list_members",
+    {
+        description = S(
+            "list group member names"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local group = param
+            if not player_groups[
+                group
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            for_all_members(
+                group,
+                function(
+                    player,
+                    name
+                )
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found player %s"
+                            ),
+                            name
+                        )
+                    )
+                end
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "every_student",
     {
         description = S(
@@ -897,6 +1397,58 @@ minetest.register_chatcommand(
             param
         )
             for_all_students(
+                function(
+                    player,
+                    name
+                )
+                    local command, params = split_command(
+                        string.gsub(
+                            param,
+                            "subject",
+                            name
+                        )
+                    )
+                    minetest.chatcommands[
+                        command
+                    ].func(
+                        own_name,
+                        params
+                    )
+                end
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "every_member",
+    {
+        description = S(
+            "apply command to all group members"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local group, param = split_command(
+                param
+            )
+            if not player_groups[
+                group
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "group does not exists"
+                    )
+                )
+                return
+            end
+            for_all_members(
+                group,
                 function(
                     player,
                     name
@@ -1082,4 +1634,6 @@ edutest = {
     set_highlight_marker_click_handler = set_highlight_marker_click_handler,
     set_highlight_marker_tooltip = set_highlight_marker_tooltip,
     for_all_students = for_all_students,
+    for_all_members = for_all_members,
+    for_all_groups = for_all_groups,
 }
