@@ -30,3 +30,4 @@ apply command to all group members = Kommando auf alle Gruppenmitglieder anwende
 list group names = Namen der Gruppen anzeigen
 found group %s (player count %d) = Gruppe %s (Spieleranzahl %d) gefunden
 make the highlighted area owned by a group = nimmt den markierten Bereich für eine Gruppe in Besitz
+group and area name must be specified = Gruppen- und Gebietsname muss angegeben werden
