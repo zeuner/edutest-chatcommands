@@ -1085,6 +1085,120 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "highlight_set_owner_group",
+    {
+        description = S(
+            "make the highlighted area owned by a group"
+        ),
+        privs = {
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local group, area = param:match(
+                '^(%S+)%s(.+)$'
+            )
+            if not group then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "group and area name must be specified"
+                        )
+                    )
+                )
+                return
+            end
+            if not player_highlighted[
+                own_name
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no area highlighted yet"
+                        )
+                    )
+                )
+                return
+            end
+            minetest.chatcommands[
+                "area_pos1"
+            ].func(
+                own_name,
+                player_highlighted[
+                    own_name
+                ].pos1.x .. " " .. player_highlighted[
+                    own_name
+                ].pos1.y .. " " .. player_highlighted[
+                    own_name
+                ].pos1.z
+            )
+            minetest.chatcommands[
+                "area_pos2"
+            ].func(
+                own_name,
+                player_highlighted[
+                    own_name
+                ].pos2.x .. " " .. player_highlighted[
+                    own_name
+                ].pos2.y .. " " .. player_highlighted[
+                    own_name
+                ].pos2.z
+            )
+            local before = highlighted_areas(
+                own_name
+            )
+            minetest.chatcommands[
+                "set_owner"
+            ].func(
+                own_name,
+                minetest.settings:get(
+                    "name"
+                ) .. " " .. area
+            )
+            local after = highlighted_areas(
+                own_name
+            )
+            for id, v in pairs(
+                before
+            ) do
+                after[
+                    id
+                ] = nil
+            end
+            local new_area_id
+            for id, v in pairs(
+                after
+            ) do
+                new_area_id = id
+            end
+            for_all_members(
+                group,
+                function(
+                    player,
+                    name
+                )
+                    minetest.chatcommands[
+                        "add_owner"
+                    ].func(
+                        own_name,
+                        new_area_id .. " " .. name .. " " .. area
+                    )
+                end
+            )
+            minetest.chatcommands[
+                "remove_area"
+            ].func(
+                own_name,
+                new_area_id
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
     "creative_hand",
     {
         description = S(
