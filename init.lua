@@ -1036,6 +1036,12 @@ minetest.register_chatcommand(
                     )
                 end
             )
+            minetest.chatcommands[
+                "remove_area"
+            ].func(
+                own_name,
+                new_area_id
+            )
         end
     }
 )
