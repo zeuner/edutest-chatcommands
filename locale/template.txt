@@ -29,3 +29,4 @@ list group member names =
 apply command to all group members =
 list group names =
 found group %s (player count %d) =
+make the highlighted area owned by a group =
