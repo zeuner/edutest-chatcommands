@@ -339,6 +339,7 @@ end
 minetest.register_chatcommand(
     "highlight_pos1",
     {
+        params = "",
         description = S(
             "set position 1 of the highlighted area"
         ),
@@ -381,6 +382,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "highlight_pos2",
     {
+        params = "",
         description = S(
             "set position 2 of the highlighted area"
         ),
@@ -423,6 +425,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "highlight_areas",
     {
+        params = "<" .. S(
+            "command"
+        ) .. "> [" .. S(
+            "parameters"
+        ) .. "...]",
         description = S(
             "apply areas command on highlighted area"
         ),
@@ -485,6 +492,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "creative_hand",
     {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
         description = S(
             "set the empty hand of a player to creative mode characteristics"
         ),
@@ -533,6 +543,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "basic_hand",
     {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
         description = S(
             "set the empty hand of a player to survival mode characteristics"
         ),
@@ -581,6 +594,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_keep_priv",
     {
+        params = "<" .. S(
+            "privilege"
+        ) .. ">",
         description = S(
             "keep privilege on student join"
         ),
@@ -601,6 +617,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_revoke",
     {
+        params = "<" .. S(
+            "privilege"
+        ) .. ">",
         description = S(
             "revoke privilege on student join"
         ),
@@ -633,6 +652,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_grant",
     {
+        params = "<" .. S(
+            "privilege"
+        ) .. ">",
         description = S(
             "grant privilege on student join"
         ),
@@ -665,6 +687,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_students",
     {
+        params = "",
         description = S(
             "list student player names"
         ),
@@ -698,6 +721,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "every_student",
     {
+        params = "<" .. S(
+            "command"
+        ) .. "> [" .. S(
+            "parameters"
+        ) .. "...]",
         description = S(
             "apply command to all student players"
         ),
@@ -735,6 +763,15 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "visitation",
     {
+        params = "<X>,<Y>,<Z> | <" .. S(
+            "destination player"
+        ) .. "> | <" .. S(
+            "teleported player"
+        ) .. "> <X>,<Y>,<Z> | <" .. S(
+            "teleported player"
+        ) .. "> <" .. S(
+            "destination player"
+        ) .. ">",
         description = S(
             "reversibly teleport self or other players"
         ),
@@ -800,6 +837,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "return",
     {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
         description = S(
             "teleport to location before the last visitation command"
         ),
