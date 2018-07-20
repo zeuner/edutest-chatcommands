@@ -212,11 +212,11 @@ local entity_selection_box = "selectionbox"
         for w in (
             version.string .. "."
         ):gmatch(
-            "([^.]*)[.]"
+            "([0-9]*)[.]"
         ) do
             table.insert(
                 components,
-                w
+                "0" .. w
             )
         end
         local numeric = 0
