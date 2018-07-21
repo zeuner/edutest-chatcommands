@@ -1846,7 +1846,6 @@ minetest.register_on_joinplayer(
 )
 
 edutest = {
-    highlighted_areas = highlighted_areas,
     adapt_highlighted_area = adapt_highlighted_area,
     set_highlight_marker_click_handler = set_highlight_marker_click_handler,
     set_highlight_marker_tooltip = set_highlight_marker_tooltip,
