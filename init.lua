@@ -238,6 +238,15 @@ local entity_selection_box = "selectionbox"
 )(
 )
 
+local player_highlighted = {
+}
+
+local player_markers = {
+}
+
+local player_groups = {
+}
+
 local marker_properties = {
     initial_properties = {
         visual = "upright_sprite",
@@ -246,6 +255,72 @@ local marker_properties = {
         },
         physical = false,
     },
+    on_activate = function(
+        self,
+        staticdata
+    )
+        local data = minetest.deserialize(
+            staticdata
+        )
+        if not data then
+            print(
+                "EDUtest no marker data given, removing"
+            )
+            self.object:remove(
+            )
+            return
+        end
+        if data[
+            "object_propertios"
+        ] then
+            self.object:set_properties(
+                data[
+                    "object_propertios"
+                ]
+            )
+            data[
+                "object_propertios"
+            ] = nil
+        end
+        if data[
+            "player_name"
+        ] then
+            if not player_markers[
+                data[
+                    "player_name"
+                ]
+            ] then
+                player_markers[
+                    data[
+                        "player_name"
+                    ]
+                ] = {
+                }
+            end
+             player_markers[
+                data[
+                    "player_name"
+                ]
+            ][
+                data[
+                    "marker_id"
+                ]
+            ] = self.object
+            data[
+                "marker_id"
+            ] = nil
+            data[
+                "player_name"
+            ] = nil
+        end
+        for k, v in pairs(
+            data
+        ) do
+            self[
+                k
+            ] = v
+        end
+    end,
     on_step = function(
         self,
         dtime
@@ -264,6 +339,34 @@ local marker_properties = {
             clicker
         )
     end,
+    get_staticdata = function(
+        self
+    )
+        local serializable = {
+        }
+        for k,v in pairs(
+            self
+        ) do
+            local value_type = type(
+                v
+            )
+            if (
+                'userdata' ~= value_type
+                 and 'function' ~= value_type
+            ) then
+                serializable[
+                    k
+                ] = v
+            end
+        end
+        serializable[
+            "object_propertios"
+        ] = self.object:get_properties(
+        )
+        return minetest.serialize(
+            serializable
+        )
+    end,
     range = nil,
 }
 
@@ -279,15 +382,6 @@ local set_highlight_marker_tooltip = function(
         "edutest:highlight_marker"
     ].initial_properties.infotext = tooltip
 end
-
-local player_highlighted = {
-}
-
-local player_markers = {
-}
-
-local player_groups = {
-}
 
 local storage = minetest.get_mod_storage(
 )
@@ -452,7 +546,11 @@ local highlight_positions = function(
             ] = displaced
             local marker = minetest.add_entity(
                 marker_pos,
-                "edutest:highlight_marker"
+                "edutest:highlight_marker",
+                minetest.serialize(
+                    {
+                    }
+                )
             )
             marker:set_yaw(
                 axis.rotation
@@ -498,11 +596,16 @@ local highlight_positions = function(
             }
             marker:get_luaentity(
             ).range = axis.range
+            local marker_id = axis.displacement .. displaced
+            marker:get_luaentity(
+            ).marker_id = marker_id
+            marker:get_luaentity(
+            ).player_name = name
             marker:set_properties(
                 marker_properties
             )
             markers[
-                axis.displacement .. displaced
+                marker_id
             ] = marker
         end
     end
