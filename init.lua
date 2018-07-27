@@ -39,6 +39,7 @@ local on_join_handlers = {
 local for_all_students = function(
     action
 )
+    local found = false
     for _, player in pairs(
         minetest.get_connected_players(
         )
@@ -51,12 +52,14 @@ local for_all_students = function(
         if true == privs[
             "student"
         ] then
+            found = true
             action(
                 player,
                 name
             )
         end
     end
+    return found
 end
 
 local digtime = 42
@@ -436,25 +439,30 @@ end
 local for_all_groups = function(
     action
 )
+    local found = false
     for name, content in pairs(
         player_groups
     ) do
+        found = true
         action(
             name,
             content
         )
     end
+    return found
 end
 
 local for_all_members = function(
     group,
     action
 )
+    local found = false
     for name, v in pairs(
         player_groups[
             group
         ]
     ) do
+        found = true
         local player = minetest.get_player_by_name(
             name
         )
@@ -463,6 +471,7 @@ local for_all_members = function(
             name
         )
     end
+    return found
 end
 
 local highlight_positions = function(
@@ -1277,7 +1286,7 @@ minetest.register_chatcommand(
             ) do
                 new_area_id = id
             end
-            for_all_members(
+            if not for_all_members(
                 group,
                 function(
                     player,
@@ -1290,7 +1299,16 @@ minetest.register_chatcommand(
                         new_area_id .. " " .. name .. " " .. area
                     )
                 end
-            )
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no group members found"
+                        )
+                    )
+                )
+            end
             minetest.chatcommands[
                 "remove_area"
             ].func(
@@ -1494,7 +1512,7 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for_all_students(
+            if not for_all_students(
                 function(
                     player,
                     name
@@ -1509,7 +1527,16 @@ minetest.register_chatcommand(
                         )
                     )
                 end
-            )
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no student players found"
+                        )
+                    )
+                )
+            end
         end,
     }
 )
@@ -1527,7 +1554,7 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for_all_groups(
+            if not for_all_groups(
                 function(
                     name,
                     players
@@ -1549,7 +1576,16 @@ minetest.register_chatcommand(
                         )
                     )
                end
-            )
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no groups configured"
+                        )
+                    )
+                )
+            end
         end,
     }
 )
@@ -1579,7 +1615,7 @@ minetest.register_chatcommand(
                 )
                 return
             end
-            for_all_members(
+            if not for_all_members(
                 group,
                 function(
                     player,
@@ -1595,7 +1631,16 @@ minetest.register_chatcommand(
                         )
                     )
                 end
-            )
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no group members found"
+                        )
+                    )
+                )
+            end
         end,
     }
 )
@@ -1613,7 +1658,7 @@ minetest.register_chatcommand(
             own_name,
             param
         )
-            for_all_students(
+            if not for_all_students(
                 function(
                     player,
                     name
@@ -1632,7 +1677,16 @@ minetest.register_chatcommand(
                         params
                     )
                 end
-            )
+            ) then
+                 minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no student players found"
+                        )
+                    )
+                )
+            end
         end,
     }
 )
@@ -1664,7 +1718,7 @@ minetest.register_chatcommand(
                 )
                 return
             end
-            for_all_members(
+            if not for_all_members(
                 group,
                 function(
                     player,
@@ -1684,7 +1738,16 @@ minetest.register_chatcommand(
                         params
                     )
                 end
-            )
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no group members found"
+                        )
+                    )
+                )
+            end
         end,
     }
 )
