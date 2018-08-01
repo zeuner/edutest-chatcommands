@@ -34,3 +34,5 @@ group and area name must be specified = Gruppen- und Gebietsname muss angegeben 
 no group members found = Keine Gruppenmitglieder gefunden
 no student players found = Keine Schüler gefunden
 no groups configured = Keine Gruppen eingerichtet
+no student players found within the highlighted area = Keine Schüler im markierten Bereich gefunden
+apply command to all student players within the highlighted area = Kommando auf alle Schüler im markierten Bereich anwenden

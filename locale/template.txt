@@ -34,3 +34,5 @@ group and area name must be specified =
 no group members found =
 no student players found =
 no groups configured =
+no student players found within the highlighted area =
+apply command to all student players within the highlighted area =

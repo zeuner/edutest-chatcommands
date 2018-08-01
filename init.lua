@@ -62,6 +62,51 @@ local for_all_students = function(
     return found
 end
 
+local for_all_students_within_area = function(
+    boundaries,
+    action
+)
+    local found = false
+    for _, player in pairs(
+        minetest.get_connected_players(
+        )
+    ) do
+        local name = player:get_player_name(
+        )
+        local privs = minetest.get_player_privs(
+            name
+        )
+        if true == privs[
+            "student"
+        ] then
+            found = true
+            local pos = player:get_pos(
+            )
+            for axis, value in pairs(
+                pos
+            ) do
+                if value < boundaries.min[
+                    axis
+                ] then
+                    found = false
+                end
+                if boundaries.max[
+                    axis
+                ] < value then
+                    found = false
+                end
+            end
+            if found then
+                action(
+                    player,
+                    name
+                )
+            end
+        end
+    end
+    return found
+end
+
 local digtime = 42
 
 local caps = {
@@ -1683,6 +1728,101 @@ minetest.register_chatcommand(
                     "EDUtest: " .. string.format(
                         S(
                             "no student players found"
+                        )
+                    )
+                )
+            end
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "every_highlighted",
+    {
+        description = S(
+            "apply command to all student players within the highlighted area"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if not player_highlighted[
+                own_name
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no area highlighted yet"
+                        )
+                    )
+                )
+                return
+            end
+            local boundaries = {
+            }
+            local pos1 = player_highlighted[
+                own_name
+            ].pos1
+            local pos2 = player_highlighted[
+                own_name
+            ].pos2
+            for _, extreme in ipairs(
+                {
+                    "min",
+                    "max",
+                }
+            ) do
+                boundaries[
+                    extreme
+                ] = {
+                }
+                for axis, value in pairs(
+                    pos1
+                ) do
+                    boundaries[
+                        extreme
+                    ][
+                        axis
+                    ] = math[
+                        extreme
+                    ](
+                        value,
+                        pos2[
+                            axis
+                        ]
+                    )
+                end
+            end
+            if not for_all_students_within_area(
+                boundaries,
+                function(
+                    player,
+                    name
+                )
+                    local command, params = split_command(
+                        string.gsub(
+                            param,
+                            "subject",
+                            name
+                        )
+                    )
+                    minetest.chatcommands[
+                        command
+                    ].func(
+                        own_name,
+                        params
+                    )
+                end
+            ) then
+                 minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no student players found within the highlighted area"
                         )
                     )
                 )
