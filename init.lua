@@ -688,6 +688,9 @@ end
 minetest.register_chatcommand(
     "create_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. ">",
         description = S(
             "create a group of players"
         ),
@@ -747,6 +750,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "delete_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. ">",
         description = S(
             "delete a group of players"
         ),
@@ -805,6 +811,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "enter_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "player name"
+        ) .. ">",
         description = S(
             "add a player to a group"
         ),
@@ -911,6 +922,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "leave_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "player name"
+        ) .. ">",
         description = S(
             "remove a player from a group"
         ),
@@ -1206,6 +1222,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "highlight_set_owner_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "area name"
+        ) .. ">",
         description = S(
             "make the highlighted area owned by a group"
         ),
@@ -1567,6 +1588,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_groups",
     {
+        params = "",
         description = S(
             "list group names"
         ),
@@ -1616,6 +1638,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_members",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. ">",
         description = S(
             "list group member names"
         ),
@@ -1722,6 +1747,13 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "every_member",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "command"
+        ) .. "> [" .. S(
+            "parameters"
+        ) .. "...]",
         description = S(
             "apply command to all group members"
         ),

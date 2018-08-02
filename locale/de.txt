@@ -45,3 +45,5 @@ set position 2 of the highlighted area = Setze Position 2 des markierten Bereich
 apply areas command on highlighted area = Wende ein Gebietskommando (areas-Mod) auf den markierten Bereich an
 set the empty hand of a player to creative mode characteristics = Statte die leere Hand mit Kreativmoduscharakteristika aus
 set the empty hand of a player to survival mode characteristics = Statte die leere Hand mit Überlebensmoduscharakteristika aus
+group name = Gruppenname
+area name = Gebietsname
