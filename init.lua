@@ -519,17 +519,11 @@ local for_all_members = function(
     return found
 end
 
-local highlight_positions = function(
-    name
+local edge_boundaries = function(
+    pos1,
+    pos2
 )
-    active_marker = 1
-    local pos1 = player_highlighted[
-        name
-    ].pos1
-    local pos2 = player_highlighted[
-        name
-    ].pos2
-    local pos = {
+    local boundaries = {
     }
     for _, extreme in ipairs(
         {
@@ -537,27 +531,42 @@ local highlight_positions = function(
             "max",
         }
     ) do
-        pos[
+        boundaries[
             extreme
         ] = {
         }
-        for k, v in pairs(
+        for axis, value in pairs(
             pos1
         ) do
-            pos[
+            boundaries[
                 extreme
             ][
-                k
+                axis
             ] = math[
                 extreme
             ](
-                v,
+                value,
                 pos2[
-                    k
+                    axis
                 ]
             )
         end
     end
+    return boundaries
+end
+
+local highlight_positions = function(
+    name
+)
+    active_marker = 1
+    local pos = edge_boundaries(
+        player_highlighted[
+            name
+        ].pos1,
+        player_highlighted[
+            name
+        ].pos2
+    )
     local markers = {
     }
     for _, axis in ipairs(
@@ -1736,6 +1745,42 @@ minetest.register_chatcommand(
     }
 )
 
+local edge_boundaries = function(
+    pos1,
+    pos2
+)
+    local boundaries = {
+    }
+    for _, extreme in ipairs(
+        {
+            "min",
+            "max",
+        }
+    ) do
+        boundaries[
+            extreme
+        ] = {
+        }
+        for axis, value in pairs(
+            pos1
+        ) do
+            boundaries[
+                extreme
+            ][
+                axis
+            ] = math[
+                extreme
+            ](
+                value,
+                pos2[
+                    axis
+                ]
+            )
+        end
+    end
+    return boundaries
+end
+
 minetest.register_chatcommand(
     "every_highlighted",
     {
@@ -1762,41 +1807,14 @@ minetest.register_chatcommand(
                 )
                 return
             end
-            local boundaries = {
-            }
-            local pos1 = player_highlighted[
-                own_name
-            ].pos1
-            local pos2 = player_highlighted[
-                own_name
-            ].pos2
-            for _, extreme in ipairs(
-                {
-                    "min",
-                    "max",
-                }
-            ) do
-                boundaries[
-                    extreme
-                ] = {
-                }
-                for axis, value in pairs(
-                    pos1
-                ) do
-                    boundaries[
-                        extreme
-                    ][
-                        axis
-                    ] = math[
-                        extreme
-                    ](
-                        value,
-                        pos2[
-                            axis
-                        ]
-                    )
-                end
-            end
+            local boundaries = edge_boundaries(
+                player_highlighted[
+                    own_name
+                ].pos1,
+                player_highlighted[
+                    own_name
+                ].pos2
+            )
             if not for_all_students_within_area(
                 boundaries,
                 function(
