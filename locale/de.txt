@@ -47,3 +47,5 @@ set the empty hand of a player to creative mode characteristics = Statte die lee
 set the empty hand of a player to survival mode characteristics = Statte die leere Hand mit Überlebensmoduscharakteristika aus
 group name = Gruppenname
 area name = Gebietsname
+no student players found within the highlighted area = Keine Schüler im markierten Bereich gefunden
+apply command to all student players within the highlighted area = Kommando auf alle Schüler im markierten Bereich anwenden
