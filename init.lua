@@ -39,7 +39,7 @@ local on_join_handlers = {
 local for_all_students = function(
     action
 )
-    local found = false
+    local found = 0
     for _, player in pairs(
         minetest.get_connected_players(
         )
@@ -52,21 +52,25 @@ local for_all_students = function(
         if true == privs[
             "student"
         ] then
-            found = true
+            found = found + 1
             action(
                 player,
                 name
             )
         end
     end
-    return found
+    if 0 == found then
+        return false
+    else
+        return found
+    end
 end
 
 local for_all_students_within_area = function(
     boundaries,
     action
 )
-    local found = false
+    local found = 0
     for _, player in pairs(
         minetest.get_connected_players(
         )
@@ -79,7 +83,7 @@ local for_all_students_within_area = function(
         if true == privs[
             "student"
         ] then
-            found = true
+            local within_area = true
             local pos = player:get_pos(
             )
             for axis, value in pairs(
@@ -88,15 +92,16 @@ local for_all_students_within_area = function(
                 if value < boundaries.min[
                     axis
                 ] then
-                    found = false
+                    within_area = false
                 end
                 if boundaries.max[
                     axis
                 ] < value then
-                    found = false
+                    within_area = false
                 end
             end
-            if found then
+            if within_area then
+                found = found + 1
                 action(
                     player,
                     name
@@ -104,7 +109,11 @@ local for_all_students_within_area = function(
             end
         end
     end
-    return found
+    if 0 == found then
+        return false
+    else
+        return found
+    end
 end
 
 local digtime = 42
@@ -333,6 +342,16 @@ local marker_properties = {
         if data[
             "player_name"
         ] then
+            if not data[
+                "marker_id"
+            ] then
+                print(
+                    "EDUtest marker id missing, removing"
+                )
+                self.object:remove(
+                )
+                return
+            end
             if not player_markers[
                 data[
                     "player_name"
@@ -345,7 +364,7 @@ local marker_properties = {
                 ] = {
                 }
             end
-             player_markers[
+            player_markers[
                 data[
                     "player_name"
                 ]
@@ -354,12 +373,6 @@ local marker_properties = {
                     "marker_id"
                 ]
             ] = self.object
-            data[
-                "marker_id"
-            ] = nil
-            data[
-                "player_name"
-            ] = nil
         end
         for k, v in pairs(
             data
@@ -416,6 +429,8 @@ local marker_properties = {
         )
     end,
     range = nil,
+    player_name = nil,
+    marker_id = nil,
 }
 
 minetest.register_entity(
@@ -484,30 +499,34 @@ end
 local for_all_groups = function(
     action
 )
-    local found = false
+    local found = 0
     for name, content in pairs(
         player_groups
     ) do
-        found = true
+        found = found + 1
         action(
             name,
             content
         )
     end
-    return found
+    if 0 == found then
+        return false
+    else
+        return found
+    end
 end
 
 local for_all_members = function(
     group,
     action
 )
-    local found = false
+    local found = 0
     for name, v in pairs(
         player_groups[
             group
         ]
     ) do
-        found = true
+        found = found + 1
         local player = minetest.get_player_by_name(
             name
         )
@@ -516,7 +535,11 @@ local for_all_members = function(
             name
         )
     end
-    return found
+    if 0 == found then
+        return false
+    else
+        return found
+    end
 end
 
 local edge_boundaries = function(
