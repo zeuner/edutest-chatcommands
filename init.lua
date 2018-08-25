@@ -259,41 +259,9 @@ end
 
 local entity_selection_box = "selectionbox"
 
-(
-    function(
-    )
-        local version = minetest.get_version(
-        )
-        local components = {
-        }
-        for w in (
-            version.string .. "."
-        ):gmatch(
-            "([0-9]*)[.]"
-        ) do
-            table.insert(
-                components,
-                "0" .. w
-            )
-        end
-        local numeric = 0
-        local significance = 1000000
-        for n, w in ipairs(
-            components
-        ) do
-            numeric = numeric + significance * w
-            significance = math.floor(
-                (
-                    significance / 100
-                ) + 0.5
-            )
-        end
-        if 50000 > numeric then
-            entity_selection_box = "collisionbox"
-        end
-    end
-)(
-)
+if not minetest.features.object_independent_selectionbox then
+    entity_selection_box = "collisionbox"
+end
 
 local player_highlighted = {
 }
