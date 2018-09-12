@@ -1,17 +1,11 @@
-local S
+local MP = minetest.get_modpath(
+    minetest.get_current_modname(
+    )
+)
 
-if minetest.get_modpath(
-    "intllib"
-) then
-    S = intllib.Getter(
-    )
-else
-    S = function(
-        translated
-    )
-        return translated
-    end
-end
+local S, NS = dofile(
+    MP .. "/intllib.lua"
+)
 
 minetest.register_privilege(
     'student',
