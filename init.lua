@@ -30,6 +30,35 @@ minetest.register_privilege(
 local on_join_handlers = {
 }
 
+local last_one_shot = 0
+
+local register_one_shot = function(
+    name,
+    action
+)
+    last_one_shot = last_one_shot + 1
+    local this_one_shot = last_one_shot
+    local handler_id = "one_shot_" .. this_one_shot
+    on_join_handlers[
+        handler_id
+    ] = {
+        func = function(
+            joining_player,
+            joining_name
+        )
+            if name == joining_name then
+                action(
+                    joining_player,
+                    joining_name
+                )
+                on_join_handlers[
+                    handler_id
+                ] = nil
+            end
+        end,
+    }
+end
+
 local for_all_students = function(
     action
 )
@@ -2024,6 +2053,68 @@ minetest.register_chatcommand(
             ].func(
                 own_name,
                 param
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "setnextpos",
+    {
+        params = "<" .. S(
+            "player"
+        ) .. ">",
+        description = S(
+            "have a player start at the current position on the next login"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local positioned = minetest.get_player_by_name(
+                param
+            )
+            if not positioned then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        param
+                    )
+                )
+                return
+            end
+            local current_pos = positioned:get_pos(
+            )
+            teleportee:set_attribute(
+                "next_login_position",
+                minetest.serialize(
+                    current_pos
+                )
+            )
+            register_one_shot(
+                param,
+                function(
+                    player,
+                    name
+                )
+                    local login_position = player:get_attribute(
+                        "next_login_position"
+                    )
+                    if login_position then
+                        login_position = minetest.deserialize(
+                            login_position
+                        )
+                    end
+                    player:set_pos(
+                        login_position
+                    )
+                end
             )
         end,
     }
