@@ -1,17 +1,11 @@
-local S
+local MP = minetest.get_modpath(
+    minetest.get_current_modname(
+    )
+)
 
-if minetest.get_modpath(
-    "intllib"
-) then
-    S = intllib.Getter(
-    )
-else
-    S = function(
-        translated
-    )
-        return translated
-    end
-end
+local S, NS = dofile(
+    MP .. "/intllib.lua"
+)
 
 minetest.register_privilege(
     'student',
@@ -35,6 +29,35 @@ minetest.register_privilege(
 
 local on_join_handlers = {
 }
+
+local last_one_shot = 0
+
+local register_one_shot = function(
+    name,
+    action
+)
+    last_one_shot = last_one_shot + 1
+    local this_one_shot = last_one_shot
+    local handler_id = "one_shot_" .. this_one_shot
+    on_join_handlers[
+        handler_id
+    ] = {
+        func = function(
+            joining_player,
+            joining_name
+        )
+            if name == joining_name then
+                action(
+                    joining_player,
+                    joining_name
+                )
+                on_join_handlers[
+                    handler_id
+                ] = nil
+            end
+        end,
+    }
+end
 
 local for_all_students = function(
     action
@@ -733,6 +756,9 @@ end
 minetest.register_chatcommand(
     "create_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. ">",
         description = S(
             "create a group of players"
         ),
@@ -792,6 +818,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "delete_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. ">",
         description = S(
             "delete a group of players"
         ),
@@ -850,6 +879,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "enter_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "player name"
+        ) .. ">",
         description = S(
             "add a player to a group"
         ),
@@ -956,6 +990,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "leave_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "player name"
+        ) .. ">",
         description = S(
             "remove a player from a group"
         ),
@@ -1062,6 +1101,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "highlight_pos1",
     {
+        params = "",
         description = S(
             "set position 1 of the highlighted area"
         ),
@@ -1104,6 +1144,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "highlight_pos2",
     {
+        params = "",
         description = S(
             "set position 2 of the highlighted area"
         ),
@@ -1182,6 +1223,11 @@ end
 minetest.register_chatcommand(
     "highlight_areas",
     {
+        params = "<" .. S(
+            "command"
+        ) .. "> [" .. S(
+            "parameters"
+        ) .. "...]",
         description = S(
             "apply areas command on highlighted area"
         ),
@@ -1244,6 +1290,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "highlight_set_owner_group",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "area name"
+        ) .. ">",
         description = S(
             "make the highlighted area owned by a group"
         ),
@@ -1367,6 +1418,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "creative_hand",
     {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
         description = S(
             "set the empty hand of a player to creative mode characteristics"
         ),
@@ -1415,6 +1469,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "basic_hand",
     {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
         description = S(
             "set the empty hand of a player to survival mode characteristics"
         ),
@@ -1463,6 +1520,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_keep_priv",
     {
+        params = "<" .. S(
+            "privilege"
+        ) .. ">",
         description = S(
             "keep privilege on student join"
         ),
@@ -1483,6 +1543,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_revoke",
     {
+        params = "<" .. S(
+            "privilege"
+        ) .. ">",
         description = S(
             "revoke privilege on student join"
         ),
@@ -1515,6 +1578,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "student_join_grant",
     {
+        params = "<" .. S(
+            "privilege"
+        ) .. ">",
         description = S(
             "grant privilege on student join"
         ),
@@ -1547,6 +1613,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_students",
     {
+        params = "",
         description = S(
             "list student player names"
         ),
@@ -1589,6 +1656,7 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_groups",
     {
+        params = "",
         description = S(
             "list group names"
         ),
@@ -1638,6 +1706,9 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "list_members",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. ">",
         description = S(
             "list group member names"
         ),
@@ -1693,6 +1764,11 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "every_student",
     {
+        params = "<" .. S(
+            "command"
+        ) .. "> [" .. S(
+            "parameters"
+        ) .. "...]",
         description = S(
             "apply command to all student players"
         ),
@@ -1843,6 +1919,13 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "every_member",
     {
+        params = "<" .. S(
+            "group name"
+        ) .. "> <" .. S(
+            "command"
+        ) .. "> [" .. S(
+            "parameters"
+        ) .. "...]",
         description = S(
             "apply command to all group members"
         ),
@@ -1904,6 +1987,15 @@ minetest.register_chatcommand(
 minetest.register_chatcommand(
     "visitation",
     {
+        params = "<X>,<Y>,<Z> | <" .. S(
+            "destination player"
+        ) .. "> | <" .. S(
+            "teleported player"
+        ) .. "> <X>,<Y>,<Z> | <" .. S(
+            "teleported player"
+        ) .. "> <" .. S(
+            "destination player"
+        ) .. ">",
         description = S(
             "reversibly teleport self or other players"
         ),
@@ -1967,8 +2059,73 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "setnextpos",
+    {
+        params = "<" .. S(
+            "player"
+        ) .. ">",
+        description = S(
+            "have a player start at the current position on the next login"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local positioned = minetest.get_player_by_name(
+                param
+            )
+            if not positioned then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        param
+                    )
+                )
+                return
+            end
+            local current_pos = positioned:get_pos(
+            )
+            teleportee:set_attribute(
+                "next_login_position",
+                minetest.serialize(
+                    current_pos
+                )
+            )
+            register_one_shot(
+                param,
+                function(
+                    player,
+                    name
+                )
+                    local login_position = player:get_attribute(
+                        "next_login_position"
+                    )
+                    if login_position then
+                        login_position = minetest.deserialize(
+                            login_position
+                        )
+                    end
+                    player:set_pos(
+                        login_position
+                    )
+                end
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "return",
     {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
         description = S(
             "teleport to location before the last visitation command"
         ),
