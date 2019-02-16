@@ -36,6 +36,24 @@ minetest.register_privilege(
 local on_join_handlers = {
 }
 
+local is_student = function(
+    player
+)
+    local name = player:get_player_name(
+    )
+    local privs = minetest.get_player_privs(
+        name
+    )
+    return privs[
+        "student"
+    ]
+end
+
+edutest = {
+}
+
+edutest.is_student = is_student
+
 local for_all_students = function(
     action
 )
@@ -46,12 +64,9 @@ local for_all_students = function(
     ) do
         local name = player:get_player_name(
         )
-        local privs = minetest.get_player_privs(
-            name
-        )
-        if true == privs[
-            "student"
-        ] then
+        if edutest.is_student(
+            player
+        ) then
             found = found + 1
             action(
                 player,
@@ -77,12 +92,9 @@ local for_all_students_within_area = function(
     ) do
         local name = player:get_player_name(
         )
-        local privs = minetest.get_player_privs(
-            name
-        )
-        if true == privs[
-            "student"
-        ] then
+        if edutest.is_student(
+            player
+        ) then
             local within_area = true
             local pos = player:get_pos(
             )
@@ -2129,11 +2141,9 @@ minetest.register_on_joinplayer(
     end
 )
 
-edutest = {
-    adapt_highlighted_area = adapt_highlighted_area,
-    set_highlight_marker_click_handler = set_highlight_marker_click_handler,
-    set_highlight_marker_tooltip = set_highlight_marker_tooltip,
-    for_all_students = for_all_students,
-    for_all_members = for_all_members,
-    for_all_groups = for_all_groups,
-}
+edutest.adapt_highlighted_area = adapt_highlighted_area
+edutest.set_highlight_marker_click_handler = set_highlight_marker_click_handler
+edutest.set_highlight_marker_tooltip = set_highlight_marker_tooltip
+edutest.for_all_students = for_all_students
+edutest.for_all_members = for_all_members
+edutest.for_all_groups = for_all_groups
