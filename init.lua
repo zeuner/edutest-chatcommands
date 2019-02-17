@@ -14,16 +14,6 @@ else
 end
 
 minetest.register_privilege(
-    'student',
-    {
-        description = S(
-            "player is affected by bulk commands targeted at students"
-        ),
-        give_to_singleplayer = false,
-    }
-)
-
-minetest.register_privilege(
     'teacher',
     {
         description = S(
@@ -44,8 +34,8 @@ local is_student = function(
     local privs = minetest.get_player_privs(
         name
     )
-    return privs[
-        "student"
+    return not privs[
+        "teacher"
     ]
 end
 
@@ -2121,12 +2111,9 @@ minetest.register_on_joinplayer(
     function (player)
         local name = player:get_player_name(
         )
-        local privs = minetest.get_player_privs(
-            name
-        )
-        if true == privs[
-            "student"
-        ] then
+        if edutest.is_student(
+            player
+        ) then
             for k, v in pairs(
                 on_join_handlers
             ) do
