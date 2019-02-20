@@ -7,16 +7,10 @@ This mod provides chatcommands for the educational staff.
 
 ## setup
 
-The commands expect the students to be marked with the "student" privilege,
-while the teacher(s) are marked with the "teacher" privilege.
+The commands expect teacher(s) to be marked with the "teacher" privilege.
 
-A common way to set this up would be to add "student" to the default_privs
-server configuration option, and to revoke it manually from the teacher(s),
-while granting them the "teacher" privilege.
+If you want to use the "student" privilege as it behaved in previous
+versions of EDUtest, you will also have to install the
+"edutest_student_privilege" mod ([1]).
 
-When doing so, be sure to keep other relevant default_privs entries. For
-example, for an otherwise standard minetest setup, default_privs should be
-set to "student, shout, interact".
-
-In order to be able to revoke privileges from the teacher, the teacher may
-not be configured as the server owner ("name" setting in minetest.conf).
+[1] https://github.com/zeuner/edutest-student-privilege
