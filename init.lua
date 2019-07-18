@@ -2219,3 +2219,4 @@ edutest.set_highlight_marker_tooltip = set_highlight_marker_tooltip
 edutest.for_all_students = for_all_students
 edutest.for_all_members = for_all_members
 edutest.for_all_groups = for_all_groups
+edutest.split_command = split_command
