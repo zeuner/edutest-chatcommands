@@ -20,6 +20,152 @@ minetest.register_privilege(
 local on_join_handlers = {
 }
 
+local original_chatcommands = {
+}
+
+local chatcommand_state = {
+}
+
+local track_on_off_commands = function(
+    on,
+    off
+)
+    chatcommand_state[
+        on
+    ] = {
+    }
+    original_chatcommands[
+        on
+    ] = {
+    }
+    for k, v in pairs(
+        minetest.chatcommands[
+            on
+        ]
+    ) do
+        original_chatcommands[
+            on
+        ][
+            k
+        ] = v
+    end
+    original_chatcommands[
+        off
+    ] = {
+    }
+    for k, v in pairs(
+        minetest.chatcommands[
+            off
+        ]
+    ) do
+        original_chatcommands[
+            off
+        ][
+            k
+        ] = v
+    end
+    minetest.chatcommands[
+        on
+    ].func = function(
+        own_name,
+        param
+    )
+        original_chatcommands[
+            on
+        ].func(
+            own_name,
+            param
+        )
+        local name = param
+        local player = minetest.get_player_by_name(
+            name
+        )
+        if not player then
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. string.format(
+                    S(
+                        "cannot find a player named %s"
+                    ),
+                    name
+                )
+            )
+            return
+        end
+        minetest.chat_send_player(
+            own_name,
+            "EDUtest: " .. string.format(
+                S(
+                    "%s registered"
+                ),
+                on
+            )
+        )
+        chatcommand_state[
+            on
+        ][
+            name
+        ] = true
+    end
+    minetest.chatcommands[
+        off
+    ].func = function(
+        own_name,
+        param
+    )
+        original_chatcommands[
+            off
+        ].func(
+            own_name,
+            param
+        )
+        local name = param
+        local player = minetest.get_player_by_name(
+            name
+        )
+        if not player then
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. string.format(
+                    S(
+                        "cannot find a player named %s"
+                    ),
+                    name
+                )
+            )
+            return
+        end
+        chatcommand_state[
+            on
+        ][
+            name
+        ] = nil
+    end
+end
+
+local tracked_command_enabled = function(
+    command
+)
+    return function(
+        name
+    )
+        return chatcommand_state[
+            command
+        ][
+            name
+        ]
+    end
+end
+
+if nil ~= minetest.chatcommands[
+    "freeze"
+] then
+    track_on_off_commands(
+        "freeze",
+        "unfreeze"
+    )
+end
+
 local is_student = function(
     player
 )
@@ -65,6 +211,36 @@ local register_one_shot = function(
             end
         end,
     }
+end
+
+local for_all_affected = function(
+    command,
+    action
+)
+    local found = 0
+    for _, player in pairs(
+        minetest.get_connected_players(
+        )
+    ) do
+        local name = player:get_player_name(
+        )
+        if chatcommand_state[
+            command
+        ][
+            name
+        ] then
+            found = found + 1
+            action(
+                player,
+                name
+            )
+        end
+    end
+    if 0 == found then
+        return false
+    else
+        return found
+    end
 end
 
 local for_all_students = function(
@@ -1519,6 +1695,11 @@ minetest.register_chatcommand(
     }
 )
 
+track_on_off_commands(
+    "creative_hand",
+    "basic_hand"
+)
+
 minetest.register_chatcommand(
     "student_join_keep_priv",
     {
@@ -1697,6 +1878,64 @@ minetest.register_chatcommand(
                     "EDUtest: " .. string.format(
                         S(
                             "no groups configured"
+                        )
+                    )
+                )
+            end
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "list_affected",
+    {
+        params = "<" .. S(
+            "command name"
+        ) .. ">",
+        description = S(
+            "list players affected by status switch command"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            local command = param
+            if not chatcommand_state[
+                command
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "no list of affected players"
+                    )
+                )
+                return
+            end
+            if not for_all_affected(
+                command,
+                function(
+                    player,
+                    name
+                )
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found player %s"
+                            ),
+                            name
+                        )
+                    )
+                end
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no affected players found"
                         )
                     )
                 )
@@ -2219,3 +2458,4 @@ edutest.set_highlight_marker_tooltip = set_highlight_marker_tooltip
 edutest.for_all_students = for_all_students
 edutest.for_all_members = for_all_members
 edutest.for_all_groups = for_all_groups
+edutest.tracked_command_enabled = tracked_command_enabled
