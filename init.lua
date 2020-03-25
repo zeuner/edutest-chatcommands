@@ -1232,6 +1232,7 @@ minetest.register_chatcommand(
             "apply areas command on highlighted area"
         ),
         privs = {
+            areas = true,
         },
         func = function(
             own_name,
@@ -1299,6 +1300,7 @@ minetest.register_chatcommand(
             "make the highlighted area owned by a group"
         ),
         privs = {
+            areas = true,
         },
         func = function(
             own_name,
