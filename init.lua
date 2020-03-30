@@ -1562,6 +1562,17 @@ minetest.register_chatcommand(
             ) do
                 new_area_id = id
             end
+            if not new_area_id then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "could not create area"
+                        )
+                    )
+                )
+                return
+            end
             if not for_all_members(
                 group,
                 function(
