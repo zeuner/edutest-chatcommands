@@ -50,3 +50,4 @@ area name = Gebietsname
 no student players found within the highlighted area = Keine Schüler im markierten Bereich gefunden
 apply command to all student players within the highlighted area = Kommando auf alle Schüler im markierten Bereich anwenden
 could not create area = Gebiet konnte nicht angelegt werden
+%s registered = %s registriert
