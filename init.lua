@@ -1456,12 +1456,22 @@ minetest.register_chatcommand(
             local command, params = split_command(
                 param
             )
-            minetest.chatcommands[
+            local handler = minetest.chatcommands[
                 command
-            ].func(
-                own_name,
-                params
-            )
+            ]
+            if handler then
+                handler.func(
+                    own_name,
+                    params
+                )
+            else
+                "EDUtest: " .. string.format(
+                    S(
+                        "unknown command %s"
+                    ),
+                    command
+                )
+            end
         end
     }
 )
@@ -2045,12 +2055,26 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    minetest.chatcommands[
+                    local handler = minetest.chatcommands[
                         command
-                    ].func(
-                        own_name,
-                        params
-                    )
+                    ]
+                    if handler then
+                        handler.func(
+                            own_name,
+                            params
+                        )
+                    else
+                        minetest.chat_send_player(
+                            own_name,
+                            "EDUtest: " .. string.format(
+                                S(
+                                    "unknown command %s"
+                                ),
+                                command
+                            )
+                        )
+                        return
+                    end
                 end
             ) then
                  minetest.chat_send_player(
@@ -2149,12 +2173,26 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    minetest.chatcommands[
+                    local handler = minetest.chatcommands[
                         command
-                    ].func(
-                        own_name,
-                        params
-                    )
+                    ]
+                    if handler then
+                        handler.func(
+                            own_name,
+                            params
+                        )
+                    else
+                        minetest.chat_send_player(
+                            own_name,
+                            "EDUtest: " .. string.format(
+                                S(
+                                    "unknown command %s"
+                                ),
+                                command
+                            )
+                        )
+                        return
+                    end
                 end
             ) then
                  minetest.chat_send_player(
@@ -2217,12 +2255,26 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    minetest.chatcommands[
+                    local handler = minetest.chatcommands[
                         command
-                    ].func(
-                        own_name,
-                        params
-                    )
+                    ]
+                    if handler then
+                        handler.func(
+                            own_name,
+                            params
+                        )
+                    else
+                        minetest.chat_send_player(
+                            own_name,
+                            "EDUtest: " .. string.format(
+                                S(
+                                    "unknown command %s"
+                                ),
+                                command
+                            )
+                        )
+                        return
+                    end
                 end
             ) then
                 minetest.chat_send_player(
