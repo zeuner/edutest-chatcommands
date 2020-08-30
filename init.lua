@@ -1465,11 +1465,14 @@ minetest.register_chatcommand(
                     params
                 )
             else
-                "EDUtest: " .. string.format(
-                    S(
-                        "unknown command %s"
-                    ),
-                    command
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "unknown command %s"
+                        ),
+                        command
+                    )
                 )
             end
         end
