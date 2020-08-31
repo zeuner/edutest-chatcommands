@@ -1027,7 +1027,7 @@ minetest.register_chatcommand(
                 minetest.chat_send_player(
                     own_name,
                     "EDUtest: " .. S(
-                        "group does not exists"
+                        "group does not exist"
                     )
                 )
                 return
@@ -1120,7 +1120,7 @@ minetest.register_chatcommand(
                 minetest.chat_send_player(
                     own_name,
                     "EDUtest: " .. S(
-                        "group does not exists"
+                        "group does not exist"
                     )
                 )
                 return
@@ -1231,7 +1231,7 @@ minetest.register_chatcommand(
                 minetest.chat_send_player(
                     own_name,
                     "EDUtest: " .. S(
-                        "group does not exists"
+                        "group does not exist"
                     )
                 )
                 return
@@ -1993,7 +1993,7 @@ minetest.register_chatcommand(
                 minetest.chat_send_player(
                     own_name,
                     "EDUtest: " .. S(
-                        "group does not exists"
+                        "group does not exist"
                     )
                 )
                 return
@@ -2240,7 +2240,7 @@ minetest.register_chatcommand(
                 minetest.chat_send_player(
                     own_name,
                     "EDUtest: " .. S(
-                        "group does not exists"
+                        "group does not exist"
                     )
                 )
                 return
