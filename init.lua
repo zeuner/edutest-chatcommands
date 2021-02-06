@@ -1532,7 +1532,7 @@ local run_chatcommand = function(
             "[EDUtest] applying command /" .. command .. " " .. arguments
         )
         return entry.func(
-            player,
+            player_name,
             arguments
         )
     else
