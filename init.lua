@@ -492,6 +492,18 @@ local marker_properties = {
             print(
                 "EDUtest no marker data given, removing"
             )
+            local removed = self.object:get_luaentity(
+            )
+            local removed_id
+            if removed then
+                removed_id = removed.marker_id
+            else
+                removed_id = "unidentified"
+            end
+            minetest.log(
+                "verbose",
+                "[EDUtest] removing marker entity " .. removed_id
+            )
             self.object:remove(
             )
             return
@@ -516,6 +528,18 @@ local marker_properties = {
             ] then
                 print(
                     "EDUtest marker id missing, removing"
+                )
+                local removed = self.object:get_luaentity(
+                )
+                local removed_id
+                if removed then
+                    removed_id = removed.marker_id
+                else
+                    removed_id = "unidentified"
+                end
+                minetest.log(
+                    "verbose",
+                    "[EDUtest] removing marker entity " .. removed_id
                 )
                 self.object:remove(
                 )
@@ -556,6 +580,18 @@ local marker_properties = {
         dtime
     )
         if not active_marker then
+            local removed = self.object:get_luaentity(
+            )
+            local removed_id
+            if removed then
+                removed_id = removed.marker_id
+            else
+                removed_id = "unidentified"
+            end
+            minetest.log(
+                "verbose",
+                "[EDUtest] removing marker entity " .. removed_id
+            )
             self.object:remove(
             )
         end
@@ -851,9 +887,23 @@ local highlight_positions = function(
             }
             marker:get_luaentity(
             ).range = axis.range
-            local marker_id = axis.displacement .. displaced
+            local x_id = pos.min.x .. "/" .. pos.max.x
+            local y_id = pos.min.y .. "/" .. pos.max.y
+            local z_id = pos.min.z .. "/" .. pos.max.z
+            local axis_id = x_id .. "," .. y_id .. "," .. z_id
+            local displacement_id = axis.displacement .. "." .. displaced
+            local marker_id = displacement_id .. "." .. axis_id
             marker:get_luaentity(
             ).marker_id = marker_id
+            local x_range = "(" .. pos.min.x .. ")-(" .. pos.max.x .. ")"
+            local y_range = "(" .. pos.min.y .. ")-(" .. pos.max.y .. ")"
+            local z_range = "(" .. pos.min.z .. ")-(" .. pos.max.z .. ")"
+            local ranges = x_range .. " " .. y_range .. " " .. z_range
+            local marker_spec = marker_id .. " " .. ranges
+            minetest.log(
+                "verbose",
+                "[EDUtest] adding marker entity " .. marker_spec
+            )
             marker:get_luaentity(
             ).player_name = name
             marker:set_properties(
@@ -872,6 +922,18 @@ local highlight_positions = function(
                 name
             ]
         ) do
+            local removed = v:get_luaentity(
+            )
+            local removed_id
+            if removed then
+                removed_id = removed.marker_id
+            else
+                removed_id = "unidentified"
+            end
+            minetest.log(
+                "verbose",
+                "[EDUtest] removing marker entity " .. removed_id
+            )
             v:remove(
             )
         end
@@ -930,6 +992,46 @@ local adapt_highlighted_area = function(
         name
     )
 end
+
+minetest.register_chatcommand(
+    "reset_inventory_page",
+    {
+        params = "[" .. S(
+            "player name"
+        ) .. "]",
+        description = S(
+            "reset a player's inventory page"
+        ),
+        privs = {
+            server = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if not edutest.reset_inventory_page then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "feature not installed"
+                    )
+                )
+            end
+            local name = nil
+            if "" == param then
+                name = own_name
+            else
+                name = param
+            end
+            local player = minetest.get_player_by_name(
+                name
+            )
+            edutest.reset_inventory_page(
+                player
+            )
+        end
+    }
+)
 
 minetest.register_chatcommand(
     "create_group",
@@ -1398,6 +1500,54 @@ local highlighted_areas = function(
     )
 end
 
+local run_chatcommand = function(
+    player,
+    command,
+    arguments
+)
+    local player_name = player:get_player_name(
+    )
+    local entry = minetest.chatcommands[
+        command
+    ]
+    if not entry then
+        minetest.chat_send_player(
+            player_name,
+            "EDUtest: " .. string.format(
+                S(
+                    "unknown command %s"
+                ),
+                command
+            )
+        )
+        return false
+    end
+    if minetest.check_player_privs(
+        player,
+        entry.privs
+    ) then
+        minetest.log(
+            "verbose",
+            "[EDUtest] applying command /" .. command .. " " .. arguments
+        )
+        return entry.func(
+            player,
+            arguments
+        )
+    else
+        minetest.chat_send_player(
+            player_name,
+            "EDUtest: " .. string.format(
+                S(
+                    "not allowed to run command %s"
+                ),
+                command
+            )
+        )
+        return false
+    end
+end
+
 minetest.register_chatcommand(
     "highlight_areas",
     {
@@ -1429,10 +1579,9 @@ minetest.register_chatcommand(
                 )
                 return
             end
-            minetest.chatcommands[
-                "area_pos1"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "area_pos1",
                 player_highlighted[
                     own_name
                 ].pos1.x .. " " .. player_highlighted[
@@ -1441,10 +1590,9 @@ minetest.register_chatcommand(
                     own_name
                 ].pos1.z
             )
-            minetest.chatcommands[
-                "area_pos2"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "area_pos2",
                 player_highlighted[
                     own_name
                 ].pos2.x .. " " .. player_highlighted[
@@ -1456,25 +1604,11 @@ minetest.register_chatcommand(
             local command, params = split_command(
                 param
             )
-            local handler = minetest.chatcommands[
-                command
-            ]
-            if handler then
-                handler.func(
-                    own_name,
-                    params
-                )
-            else
-                minetest.chat_send_player(
-                    own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "unknown command %s"
-                        ),
-                        command
-                    )
-                )
-            end
+            run_chatcommand(
+                own_name,
+                command,
+                params
+            )
         end
     }
 )
@@ -1524,10 +1658,9 @@ minetest.register_chatcommand(
                 )
                 return
             end
-            minetest.chatcommands[
-                "area_pos1"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "area_pos1",
                 player_highlighted[
                     own_name
                 ].pos1.x .. " " .. player_highlighted[
@@ -1536,10 +1669,9 @@ minetest.register_chatcommand(
                     own_name
                 ].pos1.z
             )
-            minetest.chatcommands[
-                "area_pos2"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "area_pos2",
                 player_highlighted[
                     own_name
                 ].pos2.x .. " " .. player_highlighted[
@@ -1551,10 +1683,9 @@ minetest.register_chatcommand(
             local before = highlighted_areas(
                 own_name
             )
-            minetest.chatcommands[
-                "set_owner"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "set_owner",
                 minetest.settings:get(
                     "name"
                 ) .. " " .. area
@@ -1592,10 +1723,9 @@ minetest.register_chatcommand(
                     player,
                     name
                 )
-                    minetest.chatcommands[
-                        "add_owner"
-                    ].func(
+                    run_chatcommand(
                         own_name,
+                        "add_owner",
                         new_area_id .. " " .. name .. " " .. area
                     )
                 end
@@ -1609,10 +1739,9 @@ minetest.register_chatcommand(
                     )
                 )
             end
-            minetest.chatcommands[
-                "remove_area"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "remove_area",
                 new_area_id
             )
         end
@@ -1772,10 +1901,9 @@ minetest.register_chatcommand(
                     player,
                     name
                 )
-                    minetest.chatcommands[
-                        "revoke"
-                    ].func(
+                    run_chatcommand(
                         own_name,
+                        "revoke",
                         name .. " " .. param
                     )
                 end,
@@ -1807,10 +1935,9 @@ minetest.register_chatcommand(
                     player,
                     name
                 )
-                    minetest.chatcommands[
-                        "grant"
-                    ].func(
+                    run_chatcommand(
                         own_name,
+                        "grant",
                         name .. " " .. param
                     )
                 end,
@@ -2058,26 +2185,11 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    local handler = minetest.chatcommands[
-                        command
-                    ]
-                    if handler then
-                        handler.func(
-                            own_name,
-                            params
-                        )
-                    else
-                        minetest.chat_send_player(
-                            own_name,
-                            "EDUtest: " .. string.format(
-                                S(
-                                    "unknown command %s"
-                                ),
-                                command
-                            )
-                        )
-                        return
-                    end
+                    run_chatcommand(
+                        own_name,
+                        command,
+                        params
+                    )
                 end
             ) then
                  minetest.chat_send_player(
@@ -2176,26 +2288,11 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    local handler = minetest.chatcommands[
-                        command
-                    ]
-                    if handler then
-                        handler.func(
-                            own_name,
-                            params
-                        )
-                    else
-                        minetest.chat_send_player(
-                            own_name,
-                            "EDUtest: " .. string.format(
-                                S(
-                                    "unknown command %s"
-                                ),
-                                command
-                            )
-                        )
-                        return
-                    end
+                    run_chatcommand(
+                        own_name,
+                        command,
+                        params
+                    )
                 end
             ) then
                  minetest.chat_send_player(
@@ -2258,26 +2355,11 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    local handler = minetest.chatcommands[
-                        command
-                    ]
-                    if handler then
-                        handler.func(
-                            own_name,
-                            params
-                        )
-                    else
-                        minetest.chat_send_player(
-                            own_name,
-                            "EDUtest: " .. string.format(
-                                S(
-                                    "unknown command %s"
-                                ),
-                                command
-                            )
-                        )
-                        return
-                    end
+                    run_chatcommand(
+                        own_name,
+                        command,
+                        params
+                    )
                 end
             ) then
                 minetest.chat_send_player(
@@ -2357,10 +2439,9 @@ minetest.register_chatcommand(
                     }
                 )
             )
-            minetest.chatcommands[
-                "teleport"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "teleport",
                 param
             )
         end,
@@ -2489,10 +2570,9 @@ minetest.register_chatcommand(
                     return_positions.tail
                 )
             )
-            minetest.chatcommands[
-                "teleport"
-            ].func(
+            run_chatcommand(
                 own_name,
+                "teleport",
                 teleportee_name .. " " .. old_pos.x .. "," .. old_pos.y .. "," .. old_pos.z
             )
         end,
@@ -2527,3 +2607,4 @@ edutest.for_all_students = for_all_students
 edutest.for_all_members = for_all_members
 edutest.for_all_groups = for_all_groups
 edutest.tracked_command_enabled = tracked_command_enabled
+edutest.run_chatcommand = run_chatcommand
