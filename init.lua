@@ -1501,11 +1501,12 @@ local highlighted_areas = function(
 end
 
 local run_chatcommand = function(
-    player,
+    player_name,
     command,
     arguments
 )
-    local player_name = player:get_player_name(
+    local player = minetest.get_player_by_name(
+        player_name
     )
     local entry = minetest.chatcommands[
         command
