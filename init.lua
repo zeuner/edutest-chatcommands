@@ -179,10 +179,57 @@ local is_student = function(
     ]
 end
 
+local is_teacher = function(
+    player
+)
+    local name = player:get_player_name(
+    )
+    local privs = minetest.get_player_privs(
+        name
+    )
+    return privs[
+        "teacher"
+    ]
+end
+
+local teacher_to_student = function(
+    self,
+    subject
+)
+    minetest.chatcommands[
+        "revoke"
+    ].func(
+        self:get_player_name(
+        ),
+        subject:get_player_name(
+        ) .. " teacher"
+    )
+end
+
+local student_to_teacher = function(
+    self,
+    subject
+)
+    minetest.chatcommands[
+        "grant"
+    ].func(
+        self:get_player_name(
+        ),
+        subject:get_player_name(
+        ) .. " teacher"
+    )
+end
+
 edutest = {
 }
 
 edutest.is_student = is_student
+
+edutest.is_teacher = is_teacher
+
+edutest.student_to_teacher = student_to_teacher
+
+edutest.teacher_to_student = teacher_to_student
 
 local last_one_shot = 0
 
@@ -254,6 +301,33 @@ local for_all_students = function(
         local name = player:get_player_name(
         )
         if edutest.is_student(
+            player
+        ) then
+            found = found + 1
+            action(
+                player,
+                name
+            )
+        end
+    end
+    if 0 == found then
+        return false
+    else
+        return found
+    end
+end
+
+local for_all_teachers = function(
+    action
+)
+    local found = 0
+    for _, player in pairs(
+        minetest.get_connected_players(
+        )
+    ) do
+        local name = player:get_player_name(
+        )
+        if edutest.is_teacher(
             player
         ) then
             found = found + 1
@@ -1837,6 +1911,49 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "list_teachers",
+    {
+        params = "",
+        description = S(
+            "list teacher player names"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if not for_all_teachers(
+                function(
+                    player,
+                    name
+                )
+                    minetest.chat_send_player(
+                        own_name,
+                        "EDUtest: " .. string.format(
+                            S(
+                                "found player %s"
+                            ),
+                            name
+                        )
+                    )
+                end
+            ) then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "no teacher players found"
+                        )
+                    )
+                )
+            end
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "list_groups",
     {
         params = "",
@@ -2456,6 +2573,7 @@ edutest.adapt_highlighted_area = adapt_highlighted_area
 edutest.set_highlight_marker_click_handler = set_highlight_marker_click_handler
 edutest.set_highlight_marker_tooltip = set_highlight_marker_tooltip
 edutest.for_all_students = for_all_students
+edutest.for_all_teachers = for_all_teachers
 edutest.for_all_members = for_all_members
 edutest.for_all_groups = for_all_groups
 edutest.tracked_command_enabled = tracked_command_enabled
