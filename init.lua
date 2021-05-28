@@ -785,6 +785,36 @@ local for_all_members = function(
     end
 end
 
+local for_all_nonmembers = function(
+    group,
+    action
+)
+    local found = 0
+    for _, player in pairs(
+        minetest.get_connected_players(
+        )
+    ) do
+        local name = player:get_player_name(
+        )
+        if not player_groups[
+            group
+        ][
+            name
+        ] then
+            found = found + 1
+            action(
+                player,
+                name
+            )
+        end
+    end
+    if 0 == found then
+        return false
+    else
+        return found
+    end
+end
+
 local edge_boundaries = function(
     pos1,
     pos2
@@ -1868,6 +1898,39 @@ minetest.register_chatcommand(
 )
 
 minetest.register_chatcommand(
+    "on_join_msg",
+    {
+        params = "[" .. S(
+            "message"
+        ) .. "]",
+        description = S(
+            "notify students on join"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            on_join_handlers[
+                "msg_" .. param
+            ] = {
+                func = function(
+                    player,
+                    name
+                )
+                    minetest.chat_send_player(
+                        name,
+                        param
+                    )
+                end,
+            }
+        end,
+    }
+)
+
+minetest.register_chatcommand(
     "list_students",
     {
         params = "",
@@ -2575,5 +2638,6 @@ edutest.set_highlight_marker_tooltip = set_highlight_marker_tooltip
 edutest.for_all_students = for_all_students
 edutest.for_all_teachers = for_all_teachers
 edutest.for_all_members = for_all_members
+edutest.for_all_nonmembers = for_all_nonmembers
 edutest.for_all_groups = for_all_groups
 edutest.tracked_command_enabled = tracked_command_enabled
