@@ -160,6 +160,192 @@ end
 if nil ~= minetest.chatcommands[
     "freeze"
 ] then
+    print(
+        "using external freeze mods is no longer recommended"
+    )
+end
+
+local pre_freeze = {
+}
+
+minetest.register_chatcommand(
+    "freeze",
+    {
+        params = "<name>",
+        description = S(
+            "Freeze a player"
+        ),
+        privs = {
+            privs = true
+        },
+        func = function (
+            name,
+            param
+        )
+            local player = minetest.get_player_by_name(
+                param
+            )
+            if not player then
+                minetest.chat_send_player(
+                    name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        param
+                    )
+                )
+                return
+            end
+            local pre_freeze_player = pre_freeze[
+                param
+            ]
+            if pre_freeze_player
+            and 0 == pre_freeze_player.speed
+            and 0 == pre_freeze_player.jump then
+                minetest.chat_send_player(
+                    name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "player %s is already frozen"
+                        ),
+                        param
+                    )
+                )
+                return
+            end
+            local settings_before = {
+            }
+            local physics = player:get_physics_override(
+            )
+            settings_before.speed = physics.speed
+            settings_before.jump = physics.jump
+            physics.speed = 0
+            physics.jump = 0
+            player:set_physics_override(
+                physics
+            )
+            local privileges = minetest.get_player_privs(
+                param
+            )
+            settings_before.interact = privileges.interact
+            privileges.interact = nil
+            minetest.set_player_privs(
+                param,
+                privileges
+            )
+            pre_freeze[
+                param
+            ] = settings_before
+            minetest.chat_send_all(
+                string.format(
+                    S(
+                        "%s was frozen by %s."
+                    ),
+                    param,
+                    name
+                )
+            )
+            minetest.log(
+                "action",
+                string.format(
+                    "%s was frozen at %s",
+                    param,
+                    minetest.pos_to_string(
+                        vector.round(
+                            player:get_pos(
+                            )
+                        )
+                    )
+                )
+            )
+        end
+    }
+)
+
+minetest.register_chatcommand(
+    "unfreeze",
+    {
+        params = "<name>",
+        description = S(
+            "Unfreeze a player"
+        ),
+        privs = {
+            privs = true
+        },
+        func = function (
+            name,
+            param
+        )
+            local player = minetest.get_player_by_name(
+                param
+            )
+            if not player then
+                minetest.chat_send_player(
+                    name,
+                    "EDUtest: " .. string.format(
+                        S(
+                            "cannot find a player named %s"
+                        ),
+                        param
+                    )
+                )
+                return
+            end
+            local settings_before = pre_freeze[
+                param
+            ]
+            if not settings_before then
+                settings_before = {
+                    speed = 1,
+                    jump = 1,
+                    interact = true
+                }
+            end
+            local physics = player:get_physics_override(
+            )
+            physics.speed = settings_before.speed
+            physics.jump = settings_before.jump
+            player:set_physics_override(
+                physics
+            )
+            local privileges = minetest.get_player_privs(
+                param
+            )
+            privileges.interact = settings_before.interact
+            minetest.set_player_privs(
+                param,
+                privileges
+            )
+            pre_freeze[
+                param
+            ] = nil
+            minetest.chat_send_player(
+                param,
+                S(
+                    "You aren't frozen anymore."
+                )
+            )
+            minetest.log(
+                "action",
+                string.format(
+                    "%s was molten at %s",
+                    param,
+                    minetest.pos_to_string(
+                        vector.round(
+                            player:get_pos(
+                            )
+                        )
+                    )
+                )
+            )
+        end
+    }
+)
+
+if nil ~= minetest.chatcommands[
+    "freeze"
+] then
     track_on_off_commands(
         "freeze",
         "unfreeze"
@@ -167,10 +353,8 @@ if nil ~= minetest.chatcommands[
 end
 
 local is_student = function(
-    player
+    name
 )
-    local name = player:get_player_name(
-    )
     local privs = minetest.get_player_privs(
         name
     )
@@ -180,10 +364,8 @@ local is_student = function(
 end
 
 local is_teacher = function(
-    player
+    name
 )
-    local name = player:get_player_name(
-    )
     local privs = minetest.get_player_privs(
         name
     )
@@ -192,36 +374,159 @@ local is_teacher = function(
     ]
 end
 
+edutest = {
+}
+
+local privileges_before_teacher = {
+}
+
+local storage = minetest.get_mod_storage(
+)
+
+local privileges_before_teacher_stored = storage:get(
+    "privileges_before_teacher"
+)
+
+if privileges_before_teacher_stored then
+    privileges_before_teacher = minetest.deserialize(
+        privileges_before_teacher_stored
+    )
+end
+
+local potential_additional_teacher_privileges = {
+    "ban",
+    "bring",
+    "fast",
+    "freeze",
+    "give",
+    "home",
+    "interact",
+    "invisible",
+    "kick",
+    "noclip",
+    "protection_bypass",
+    "settime",
+    "shout",
+    "teleport",
+    "worldedit",
+}
+
+local additional_teacher_privileges = {
+}
+
+for _, privilege in pairs(
+    potential_additional_teacher_privileges
+) do
+    if minetest.registered_privileges[
+        privilege
+    ] then
+        additional_teacher_privileges[
+            privilege
+        ] = true
+    end
+end
+
+local give_additional_teacher_privileges = function(
+    self,
+    subject_name
+)
+    local self_name = self:get_player_name(
+    )
+    local old_privileges = {
+    }
+    local privs = minetest.get_player_privs(
+        subject_name
+    )
+    for privilege, _ in pairs(
+        additional_teacher_privileges
+    ) do
+        old_privileges[
+            privilege
+        ] = privs[
+            privilege
+        ]
+        minetest.chatcommands[
+            "grant"
+        ].func(
+            self_name,
+            subject_name .. " " .. privilege
+        )
+    end
+    privileges_before_teacher[
+        subject_name
+    ] = old_privileges
+    storage:set_string(
+        "privileges_before_teacher",
+        minetest.serialize(
+            privileges_before_teacher
+        )
+    )
+end
+
+local revoke_additional_teacher_privileges = function(
+    self,
+    subject_name
+)
+    local self_name = self:get_player_name(
+    )
+    local before = privileges_before_teacher[
+        subject_name
+    ]
+    for privilege, _ in pairs(
+        additional_teacher_privileges
+    ) do
+        if not before[
+            privilege
+        ] then
+            minetest.chatcommands[
+                "revoke"
+            ].func(
+                self_name,
+                subject_name .. " " .. privilege
+            )
+        end
+    end
+end
+
+edutest.is_student = is_student
+
+edutest.give_additional_teacher_privileges = give_additional_teacher_privileges
+
+edutest.revoke_additional_teacher_privileges = revoke_additional_teacher_privileges
+
 local teacher_to_student = function(
     self,
-    subject
+    subject_name
 )
+    edutest.revoke_additional_teacher_privileges(
+        self,
+        subject_name
+    )
     minetest.chatcommands[
         "revoke"
     ].func(
         self:get_player_name(
         ),
-        subject:get_player_name(
-        ) .. " teacher"
+        subject_name .. " teacher"
     )
 end
 
 local student_to_teacher = function(
     self,
-    subject
+    subject_name
 )
     minetest.chatcommands[
         "grant"
     ].func(
         self:get_player_name(
         ),
-        subject:get_player_name(
-        ) .. " teacher"
+        subject_name .. " teacher"
+    )
+    edutest.give_additional_teacher_privileges(
+        self,
+        subject_name
     )
 end
-
-edutest = {
-}
 
 edutest.is_student = is_student
 
@@ -301,7 +606,35 @@ local for_all_students = function(
         local name = player:get_player_name(
         )
         if edutest.is_student(
-            player
+            name
+        ) then
+            found = found + 1
+            action(
+                player,
+                name
+            )
+        end
+    end
+    if 0 == found then
+        return false
+    else
+        return found
+    end
+end
+
+local for_all_offline_students = function(
+    action
+)
+    local found = 0
+    for name, _ in minetest.get_auth_handler(
+    ).iterate(
+    ) do
+        local player = minetest.get_player_by_name(
+            name
+        )
+        if not player
+        and edutest.is_student(
+            name
         ) then
             found = found + 1
             action(
@@ -328,7 +661,7 @@ local for_all_teachers = function(
         local name = player:get_player_name(
         )
         if edutest.is_teacher(
-            player
+            name
         ) then
             found = found + 1
             action(
@@ -356,7 +689,7 @@ local for_all_students_within_area = function(
         local name = player:get_player_name(
         )
         if edutest.is_student(
-            player
+            name
         ) then
             local within_area = true
             local pos = player:get_pos(
@@ -688,9 +1021,6 @@ local set_highlight_marker_tooltip = function(
         "edutest:highlight_marker"
     ].initial_properties.infotext = tooltip
 end
-
-local storage = minetest.get_mod_storage(
-)
 
 for group in string.gmatch(
     storage:get_string(
@@ -2616,7 +2946,7 @@ minetest.register_on_joinplayer(
         local name = player:get_player_name(
         )
         if edutest.is_student(
-            player
+            name
         ) then
             for k, v in pairs(
                 on_join_handlers
@@ -2635,6 +2965,7 @@ minetest.register_on_joinplayer(
 edutest.adapt_highlighted_area = adapt_highlighted_area
 edutest.set_highlight_marker_click_handler = set_highlight_marker_click_handler
 edutest.set_highlight_marker_tooltip = set_highlight_marker_tooltip
+edutest.for_all_offline_students = for_all_offline_students
 edutest.for_all_students = for_all_students
 edutest.for_all_teachers = for_all_teachers
 edutest.for_all_members = for_all_members

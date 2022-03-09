@@ -49,3 +49,4 @@ group name =
 area name =
 no student players found within the highlighted area =
 apply command to all student players within the highlighted area =
+group named %s removed =
