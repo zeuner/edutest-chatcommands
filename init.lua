@@ -16,8 +16,8 @@ local MP = minetest.get_modpath(
     )
 )
 
-local S, NS = dofile(
-    MP .. "/intllib.lua"
+local S = minetest.get_translator(
+    "edutest-chatcommands"
 )
 
 minetest.register_privilege(
@@ -96,10 +96,8 @@ local track_on_off_commands = function(
         if not player then
             minetest.chat_send_player(
                 own_name,
-                "EDUtest: " .. string.format(
-                    S(
-                        "cannot find a player named %s"
-                    ),
+                "EDUtest: " .. S(
+                    "cannot find a player named @1",
                     name
                 )
             )
@@ -107,10 +105,8 @@ local track_on_off_commands = function(
         end
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "%s registered"
-                ),
+            "EDUtest: " .. S(
+                "@1 registered",
                 on
             )
         )
@@ -139,10 +135,8 @@ local track_on_off_commands = function(
         if not player then
             minetest.chat_send_player(
                 own_name,
-                "EDUtest: " .. string.format(
-                    S(
-                        "cannot find a player named %s"
-                    ),
+                "EDUtest: " .. S(
+                    "cannot find a player named @1",
                     name
                 )
             )
@@ -215,10 +209,8 @@ minetest.register_chatcommand(
             if not player then
                 minetest.chat_send_player(
                     name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         param
                     )
                 )
@@ -232,10 +224,8 @@ minetest.register_chatcommand(
             and 0 == pre_freeze_player.jump then
                 minetest.chat_send_player(
                     name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "player %s is already frozen"
-                        ),
+                    "EDUtest: " .. S(
+                        "player @1 is already frozen",
                         param
                     )
                 )
@@ -271,18 +261,16 @@ minetest.register_chatcommand(
                 )
             )
             minetest.chat_send_all(
-                string.format(
-                    S(
-                        "%s was frozen by %s."
-                    ),
+                S(
+                    "@1 was frozen by @2.",
                     param,
                     name
                 )
             )
             minetest.log(
                 "action",
-                string.format(
-                    "%s was frozen at %s",
+                S(
+                    "@1 was frozen at @2",
                     param,
                     minetest.pos_to_string(
                         vector.round(
@@ -316,10 +304,8 @@ minetest.register_chatcommand(
             if not player then
                 minetest.chat_send_player(
                     name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         param
                     )
                 )
@@ -367,8 +353,8 @@ minetest.register_chatcommand(
             )
             minetest.log(
                 "action",
-                string.format(
-                    "%s was molten at %s",
+                S(
+                    "@1 was molten at @2",
                     param,
                     minetest.pos_to_string(
                         vector.round(
@@ -1890,7 +1876,8 @@ minetest.register_chatcommand(
     {
         params = "",
         description = S(
-            "set position 1 of the highlighted area"
+            "set position @1 of the highlighted area",
+            1
         ),
         privs = {
         },
@@ -1933,7 +1920,8 @@ minetest.register_chatcommand(
     {
         params = "",
         description = S(
-            "set position 2 of the highlighted area"
+            "set position @1 of the highlighted area",
+            2
         ),
         privs = {
         },
@@ -2115,10 +2103,8 @@ local handle_create_group_mod_storage = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "group named %s created"
-            ),
+        "EDUtest: " .. S(
+            "group named @1 created",
             name
         )
     )
@@ -2160,10 +2146,8 @@ local handle_create_group_playerfactions_2 = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "group named %s created"
-            ),
+        "EDUtest: " .. S(
+            "group named @1 created",
             name
         )
     )
@@ -2209,10 +2193,8 @@ local handle_delete_group_mod_storage = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "group named %s deleted"
-            ),
+        "EDUtest: " .. S(
+            "group named @1 deleted",
             name
         )
     )
@@ -2252,10 +2234,8 @@ local handle_delete_group_playerfactions_2 = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "group named %s deleted"
-            ),
+        "EDUtest: " .. S(
+            "group named @1 deleted",
             name
         )
     )
@@ -2348,10 +2328,8 @@ local handle_enter_group_mod_storage = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "player %s added to group named %s"
-            ),
+        "EDUtest: " .. S(
+            "player @1 added to group named @2",
             player,
             group
         )
@@ -2436,10 +2414,8 @@ local handle_enter_group_playerfactions_2 = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "player %s added to group named %s"
-            ),
+        "EDUtest: " .. S(
+            "player @1 added to group named @2",
             player,
             group
         )
@@ -2533,10 +2509,8 @@ local handle_leave_group_mod_storage = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "player %s removed from group named %s"
-            ),
+        "EDUtest: " .. S(
+            "player @1 removed from group named @2",
             player,
             group
         )
@@ -2621,10 +2595,8 @@ local handle_leave_group_playerfactions_2 = function(
     )
     minetest.chat_send_player(
         own_name,
-        "EDUtest: " .. string.format(
-            S(
-                "player %s removed from group named %s"
-            ),
+        "EDUtest: " .. S(
+            "player @1 removed from group named @2",
             player,
             group
         )
@@ -2643,10 +2615,8 @@ local handle_highlight_set_owner_group_mod_storage = function(
     if not group then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "group and area name must be specified"
-                )
+            "EDUtest: " .. S(
+                "group and area name must be specified"
             )
         )
         return
@@ -2656,10 +2626,8 @@ local handle_highlight_set_owner_group_mod_storage = function(
     ] then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no area highlighted yet"
-                )
+            "EDUtest: " .. S(
+                "no area highlighted yet"
             )
         )
         return
@@ -2731,10 +2699,8 @@ local handle_highlight_set_owner_group_mod_storage = function(
     ) then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no group members found"
-                )
+            "EDUtest: " .. S(
+                "no group members found"
             )
         )
     end
@@ -2756,10 +2722,8 @@ local handle_highlight_set_owner_group_playerfactions_2 = function(
     if not group then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "group and area name must be specified"
-                )
+            "EDUtest: " .. S(
+                "group and area name must be specified"
             )
         )
         return
@@ -2769,10 +2733,8 @@ local handle_highlight_set_owner_group_playerfactions_2 = function(
     ] then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no area highlighted yet"
-                )
+            "EDUtest: " .. S(
+                "no area highlighted yet"
             )
         )
         return
@@ -2862,10 +2824,8 @@ local handle_list_members_mod_storage = function(
         )
             minetest.chat_send_player(
                 own_name,
-                "EDUtest: " .. string.format(
-                    S(
-                        "found player %s"
-                    ),
+                "EDUtest: " .. S(
+                    "found player @1",
                     name
                 )
             )
@@ -2873,10 +2833,8 @@ local handle_list_members_mod_storage = function(
     ) then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no group members found"
-                )
+            "EDUtest: " .. S(
+                "no group members found"
             )
         )
     end
@@ -2908,10 +2866,8 @@ local handle_list_members_playerfactions_2 = function(
         )
             minetest.chat_send_player(
                 own_name,
-                "EDUtest: " .. string.format(
-                    S(
-                        "found player %s"
-                    ),
+                "EDUtest: " .. S(
+                    "found player @1",
                     name
                 )
             )
@@ -2919,10 +2875,8 @@ local handle_list_members_playerfactions_2 = function(
     ) then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no group members found"
-                )
+            "EDUtest: " .. S(
+                "no group members found"
             )
         )
     end
@@ -2971,10 +2925,8 @@ local handle_every_member_mod_storage = function(
     ) then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no group members found"
-                )
+            "EDUtest: " .. S(
+                "no group members found"
             )
         )
     end
@@ -3023,10 +2975,8 @@ local handle_every_member_playerfactions_2 = function(
     ) then
         minetest.chat_send_player(
             own_name,
-            "EDUtest: " .. string.format(
-                S(
-                    "no group members found"
-                )
+            "EDUtest: " .. S(
+                "no group members found"
             )
         )
     end
@@ -3173,10 +3123,8 @@ minetest.register_chatcommand(
             if not player then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         name
                     )
                 )
@@ -3224,10 +3172,8 @@ minetest.register_chatcommand(
             if not player then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         name
                     )
                 )
@@ -3378,6 +3324,389 @@ minetest.register_chatcommand(
     }
 )
 
+local item_packs = {
+}
+
+local item_packs_stored = storage:get(
+    "item_packs"
+)
+
+if item_packs_stored then
+    item_packs = minetest.deserialize(
+        item_packs_stored
+    )
+end
+
+minetest.register_chatcommand(
+    "item_pack_add",
+    {
+        params = "<" .. S(
+            "item pack name"
+        ) .. "> <" .. S(
+            "itemstring"
+        ) .. "> [" .. S(
+            "count"
+        ) .. "]",
+        description = S(
+            "add items to an item pack"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "need to specify item pack"
+                    )
+                )
+                return
+            end
+            local pack, param = split_command(
+                param
+            )
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "need to specify item"
+                    )
+                )
+                return
+            end
+            local item, count_raw = split_command(
+                param
+            )
+            if not minetest.registered_items[
+                item
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "item @1 does not exist",
+                        item
+                    )
+                )
+                return
+            end
+            local count = 1
+            if "" ~= count_raw then
+                local count_matched = count_raw:match "^%d+$"
+                if not count_matched then
+                    minetest.chat_send_player(
+                        name,
+                        "EDUtest: " .. S(
+                            "Invalid item count"
+                        )
+                    )
+                    return false
+                end
+                count = count_matched
+            end
+            if not item_packs[
+                pack
+            ] then
+                item_packs[
+                    pack
+                ] = {
+                }
+            end
+            if not item_packs[
+                pack
+            ][
+                item
+            ] then
+                item_packs[
+                    pack
+                ][
+                    item
+                ] = 0
+            end
+            item_packs[
+                pack
+            ][
+                item
+            ] = item_packs[
+                pack
+            ][
+                item
+            ] + count
+            storage:set_string(
+                "item_packs",
+                minetest.serialize(
+                    item_packs
+                )
+            )
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. S(
+                    "added @1 of item @2 to item pack @3",
+                    count,
+                    item,
+                    pack
+                )
+            )
+        end,
+    }
+)
+
+minetest.register_chatcommand(
+    "item_pack_remove",
+    {
+        params = "<" .. S(
+            "item pack name"
+        ) .. "> <" .. S(
+            "itemstring"
+        ) .. "> [" .. S(
+            "count"
+        ) .. "]",
+        description = S(
+            "remove items from an item pack"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "need to specify item pack"
+                    )
+                )
+                return
+            end
+            local pack, param = split_command(
+                param
+            )
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "need to specify item"
+                    )
+                )
+                return
+            end
+            local item, count_raw = split_command(
+                param
+            )
+            if not minetest.registered_items[
+                item
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "item @1 does not exist",
+                        item
+                    )
+                )
+                return
+            end
+            local count = "all"
+            if "" ~= count_raw then
+                local count_matched = count_raw:match "^%d+$"
+                if not count_matched then
+                    minetest.chat_send_player(
+                        name,
+                        "EDUtest: " .. S(
+                            "Invalid item count"
+                        )
+                    )
+                    return false
+                end
+                count = count_matched
+            end
+            if not item_packs[
+                pack
+            ] then
+                item_packs[
+                    pack
+                ] = {
+                }
+            end
+            if not item_packs[
+                pack
+            ][
+                item
+            ] then
+                item_packs[
+                    pack
+                ][
+                    item
+                ] = 0
+            end
+            local new_count
+            if "all" == count then
+                new_count = 0
+            else
+                new_count = item_packs[
+                    pack
+                ][
+                    item
+                ] - count
+            end
+            if 0 > new_count then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "item @1 is not included @2 times",
+                        item,
+                        count
+                    )
+                )
+                return
+            end
+            if 0 == new_count then
+                new_count = nil
+            end
+            item_packs[
+                pack
+            ][
+                item
+            ] = new_count
+            storage:set_string(
+                "item_packs",
+                minetest.serialize(
+                    item_packs
+                )
+            )
+            minetest.chat_send_player(
+                own_name,
+                "EDUtest: " .. S(
+                    "removed @1 of item @2 from item pack @3",
+                    count,
+                    item,
+                    pack
+                )
+            )
+        end,
+    }
+)
+
+local for_all_item_packs = function(
+    action
+)
+    local found = 0
+    for pack_name, _ in pairs(
+        item_packs
+    ) do
+        found = found + 1
+        action(
+            pack_name
+        )
+    end
+    if 0 == found then
+        return false
+    else
+        return found
+    end
+end
+
+local for_all_pack_items = function(
+    pack,
+    action
+)
+    local found = 0
+    if not item_packs[
+        pack
+    ] then
+        return false
+    end
+    for item, count in pairs(
+        item_packs[
+            pack
+        ]
+    ) do
+        found = found + 1
+        action(
+            item,
+            count
+        )
+    end
+    if 0 == found then
+        return false
+    else
+        return found
+    end
+end
+
+minetest.register_chatcommand(
+    "item_pack_give",
+    {
+        params = "<" .. S(
+            "player name"
+        ) .. "> <" .. S(
+            "item pack name"
+        ) .. ">",
+        description = S(
+            "add items to an item pack"
+        ),
+        privs = {
+            teacher = true,
+        },
+        func = function(
+            own_name,
+            param
+        )
+            if "" == param then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "need to specify player name"
+                    )
+                )
+                return
+            end
+            local player_name, pack = split_command(
+                param
+            )
+            if "" == pack then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "need to specify item pack"
+                    )
+                )
+                return
+            end
+            if not item_packs[
+                pack
+            ] then
+                minetest.chat_send_player(
+                    own_name,
+                    "EDUtest: " .. S(
+                        "item pack @1 does not exist",
+                        pack
+                    )
+                )
+                return
+            end
+            for_all_pack_items(
+                pack,
+                function(
+                    item_name,
+                    count
+                )
+                    minetest.chatcommands[
+                        "give"
+                    ].func(
+                        own_name,
+                        player_name .. " " .. item_name .. " " .. count
+                    )
+                end
+            )
+        end,
+    }
+)
+
 minetest.register_chatcommand(
     "list_students",
     {
@@ -3399,10 +3728,8 @@ minetest.register_chatcommand(
                 )
                     minetest.chat_send_player(
                         own_name,
-                        "EDUtest: " .. string.format(
-                            S(
-                                "found player %s"
-                            ),
+                        "EDUtest: " .. S(
+                            "found player @1",
                             name
                         )
                     )
@@ -3410,10 +3737,8 @@ minetest.register_chatcommand(
             ) then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no student players found"
-                        )
+                    "EDUtest: " .. S(
+                        "no student players found"
                     )
                 )
             end
@@ -3442,10 +3767,8 @@ minetest.register_chatcommand(
                 )
                     minetest.chat_send_player(
                         own_name,
-                        "EDUtest: " .. string.format(
-                            S(
-                                "found player %s"
-                            ),
+                        "EDUtest: " .. S(
+                            "found player @1",
                             name
                         )
                     )
@@ -3453,10 +3776,8 @@ minetest.register_chatcommand(
             ) then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no teacher players found"
-                        )
+                    "EDUtest: " .. S(
+                        "no teacher players found"
                     )
                 )
             end
@@ -3491,10 +3812,8 @@ minetest.register_chatcommand(
                     end
                     minetest.chat_send_player(
                         own_name,
-                        "EDUtest: " .. string.format(
-                            S(
-                                "found group %s (player count %d)"
-                            ),
+                        "EDUtest: " .. S(
+                            "found group @1 (player count @2)",
                             name,
                             count
                         )
@@ -3503,10 +3822,8 @@ minetest.register_chatcommand(
             ) then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no groups configured"
-                        )
+                    "EDUtest: " .. S(
+                        "no groups configured"
                     )
                 )
             end
@@ -3550,10 +3867,8 @@ minetest.register_chatcommand(
                 )
                     minetest.chat_send_player(
                         own_name,
-                        "EDUtest: " .. string.format(
-                            S(
-                                "found player %s"
-                            ),
+                        "EDUtest: " .. S(
+                            "found player @1",
                             name
                         )
                     )
@@ -3561,10 +3876,8 @@ minetest.register_chatcommand(
             ) then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no affected players found"
-                        )
+                    "EDUtest: " .. S(
+                        "no affected players found"
                     )
                 )
             end
@@ -3628,10 +3941,8 @@ minetest.register_chatcommand(
             ) then
                  minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no student players found"
-                        )
+                    "EDUtest: " .. S(
+                        "no student players found"
                     )
                 )
             end
@@ -3693,10 +4004,8 @@ minetest.register_chatcommand(
             ] then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no area highlighted yet"
-                        )
+                    "EDUtest: " .. S(
+                        "no area highlighted yet"
                     )
                 )
                 return
@@ -3732,10 +4041,8 @@ minetest.register_chatcommand(
             ) then
                  minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "no student players found within the highlighted area"
-                        )
+                    "EDUtest: " .. S(
+                        "no student players found within the highlighted area"
                     )
                 )
             end
@@ -3799,10 +4106,8 @@ minetest.register_chatcommand(
             if not teleportee then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         teleportee_name
                     )
                 )
@@ -3859,10 +4164,8 @@ minetest.register_chatcommand(
             if not positioned then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         param
                     )
                 )
@@ -3926,10 +4229,8 @@ minetest.register_chatcommand(
             if not teleportee then
                 minetest.chat_send_player(
                     own_name,
-                    "EDUtest: " .. string.format(
-                        S(
-                            "cannot find a player named %s"
-                        ),
+                    "EDUtest: " .. S(
+                        "cannot find a player named @1",
                         teleportee_name
                     )
                 )
@@ -3999,4 +4300,6 @@ edutest.for_all_teachers = for_all_teachers
 edutest.for_all_members = for_all_members
 edutest.for_all_nonmembers = for_all_nonmembers
 edutest.for_all_groups = for_all_groups
+edutest.for_all_pack_items = for_all_pack_items
+edutest.for_all_item_packs = for_all_item_packs
 edutest.tracked_command_enabled = tracked_command_enabled
