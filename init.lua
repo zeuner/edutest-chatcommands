@@ -39,6 +39,26 @@ local original_chatcommands = {
 local chatcommand_state = {
 }
 
+local apply_chatcommand = function(
+    player_name,
+    command,
+    arguments
+)
+    local result, explanation = minetest.chatcommands[
+        command
+    ].func(
+        player_name,
+        arguments
+    )
+    if explanation then
+        minetest.chat_send_player(
+            player_name,
+            "EDUtest: " .. explanation
+        )
+    end
+    return result, explanation
+end
+
 local track_on_off_commands = function(
     on,
     off
@@ -467,10 +487,9 @@ local give_additional_teacher_privileges = function(
         ] = privs[
             privilege
         ]
-        minetest.chatcommands[
-            "grant"
-        ].func(
+        apply_chatcommand(
             self_name,
+            "grant",
             subject_name .. " " .. privilege
         )
     end
@@ -504,10 +523,9 @@ local revoke_additional_teacher_privileges = function(
         if not before[
             privilege
         ] then
-            minetest.chatcommands[
-                "revoke"
-            ].func(
+            apply_chatcommand(
                 self_name,
+                "revoke",
                 subject_name .. " " .. privilege
             )
         end
@@ -528,11 +546,10 @@ local teacher_to_student = function(
         self,
         subject_name
     )
-    minetest.chatcommands[
-        "revoke"
-    ].func(
+    apply_chatcommand(
         self:get_player_name(
         ),
+        "revoke",
         subject_name .. " teacher"
     )
 end
@@ -541,11 +558,10 @@ local student_to_teacher = function(
     self,
     subject_name
 )
-    minetest.chatcommands[
-        "grant"
-    ].func(
+    apply_chatcommand(
         self:get_player_name(
         ),
+        "grant",
         subject_name .. " teacher"
     )
     edutest.give_additional_teacher_privileges(
@@ -2025,10 +2041,9 @@ minetest.register_chatcommand(
                 )
                 return
             end
-            minetest.chatcommands[
-                "area_pos1"
-            ].func(
+            apply_chatcommand(
                 own_name,
+                "area_pos1",
                 player_highlighted[
                     own_name
                 ].pos1.x .. " " .. player_highlighted[
@@ -2037,10 +2052,9 @@ minetest.register_chatcommand(
                     own_name
                 ].pos1.z
             )
-            minetest.chatcommands[
-                "area_pos2"
-            ].func(
+            apply_chatcommand(
                 own_name,
+                "area_pos2",
                 player_highlighted[
                     own_name
                 ].pos2.x .. " " .. player_highlighted[
@@ -2052,10 +2066,9 @@ minetest.register_chatcommand(
             local command, params = split_command(
                 param
             )
-            minetest.chatcommands[
-                command
-            ].func(
+            apply_chatcommand(
                 own_name,
+                command,
                 params
             )
         end
@@ -2632,10 +2645,9 @@ local handle_highlight_set_owner_group_mod_storage = function(
         )
         return
     end
-    minetest.chatcommands[
-        "area_pos1"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "area_pos1",
         player_highlighted[
             own_name
         ].pos1.x .. " " .. player_highlighted[
@@ -2644,10 +2656,9 @@ local handle_highlight_set_owner_group_mod_storage = function(
             own_name
         ].pos1.z
     )
-    minetest.chatcommands[
-        "area_pos2"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "area_pos2",
         player_highlighted[
             own_name
         ].pos2.x .. " " .. player_highlighted[
@@ -2659,10 +2670,9 @@ local handle_highlight_set_owner_group_mod_storage = function(
     local before = highlighted_areas(
         own_name
     )
-    minetest.chatcommands[
-        "set_owner"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "set_owner",
         minetest.settings:get(
             "name"
         ) .. " " .. area
@@ -2689,10 +2699,10 @@ local handle_highlight_set_owner_group_mod_storage = function(
             player,
             name
         )
+            apply_chatcommand(
             minetest.chatcommands[
-                "add_owner"
-            ].func(
                 own_name,
+                "add_owner",
                 new_area_id .. " " .. name .. " " .. area
             )
         end
@@ -2704,10 +2714,9 @@ local handle_highlight_set_owner_group_mod_storage = function(
             )
         )
     end
-    minetest.chatcommands[
-        "remove_area"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "remove_area",
         new_area_id
     )
 end
@@ -2739,10 +2748,9 @@ local handle_highlight_set_owner_group_playerfactions_2 = function(
         )
         return
     end
-    minetest.chatcommands[
-        "area_pos1"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "area_pos1",
         player_highlighted[
             own_name
         ].pos1.x .. " " .. player_highlighted[
@@ -2751,10 +2759,9 @@ local handle_highlight_set_owner_group_playerfactions_2 = function(
             own_name
         ].pos1.z
     )
-    minetest.chatcommands[
-        "area_pos2"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "area_pos2",
         player_highlighted[
             own_name
         ].pos2.x .. " " .. player_highlighted[
@@ -2766,10 +2773,9 @@ local handle_highlight_set_owner_group_playerfactions_2 = function(
     local before = highlighted_areas(
         own_name
     )
-    minetest.chatcommands[
-        "set_owner"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "set_owner",
         minetest.settings:get(
             "name"
         ) .. " " .. area
@@ -2790,10 +2796,9 @@ local handle_highlight_set_owner_group_playerfactions_2 = function(
     ) do
         new_area_id = id
     end
-    minetest.chatcommands[
-        "area_faction_open"
-    ].func(
+    apply_chatcommand(
         own_name,
+        "area_faction_open",
         new_area_id .. " " .. group
     )
 end
@@ -2915,10 +2920,9 @@ local handle_every_member_mod_storage = function(
                     name
                 )
             )
-            minetest.chatcommands[
-                command
-            ].func(
+            apply_chatcommand(
                 own_name,
+                command,
                 params
             )
         end
@@ -2965,10 +2969,9 @@ local handle_every_member_playerfactions_2 = function(
                     name
                 )
             )
-            minetest.chatcommands[
-                command
-            ].func(
+            apply_chatcommand(
                 own_name,
+                command,
                 params
             )
         end
@@ -3244,10 +3247,9 @@ minetest.register_chatcommand(
                     player,
                     name
                 )
-                    minetest.chatcommands[
-                        "revoke"
-                    ].func(
+                    apply_chatcommand(
                         own_name,
+                        "revoke",
                         name .. " " .. param
                     )
                 end,
@@ -3279,10 +3281,9 @@ minetest.register_chatcommand(
                     player,
                     name
                 )
-                    minetest.chatcommands[
-                        "grant"
-                    ].func(
+                    apply_chatcommand(
                         own_name,
+                        "grant",
                         name .. " " .. param
                     )
                 end,
@@ -3695,10 +3696,9 @@ minetest.register_chatcommand(
                     item_name,
                     count
                 )
-                    minetest.chatcommands[
-                        "give"
-                    ].func(
+                    apply_chatcommand(
                         own_name,
+                        "give",
                         player_name .. " " .. item_name .. " " .. count
                     )
                 end
@@ -3931,10 +3931,9 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    minetest.chatcommands[
-                        command
-                    ].func(
+                    apply_chatcommand(
                         own_name,
+                        command,
                         params
                     )
                 end
@@ -4031,10 +4030,9 @@ minetest.register_chatcommand(
                             name
                         )
                     )
-                    minetest.chatcommands[
-                        command
-                    ].func(
+                    apply_chatcommand(
                         own_name,
+                        command,
                         params
                     )
                 end
@@ -4132,10 +4130,9 @@ minetest.register_chatcommand(
                     }
                 )
             )
-            minetest.chatcommands[
-                "teleport"
-            ].func(
+            apply_chatcommand(
                 own_name,
+                "teleport",
                 param
             )
         end,
@@ -4260,11 +4257,11 @@ minetest.register_chatcommand(
                     return_positions.tail
                 )
             )
-            minetest.chatcommands[
-                "teleport"
-            ].func(
+            local pos_string = old_pos.x .. "," .. old_pos.y .. "," .. old_pos.z
+            apply_chatcommand(
                 own_name,
-                teleportee_name .. " " .. old_pos.x .. "," .. old_pos.y .. "," .. old_pos.z
+                "teleport",
+                teleportee_name .. " " .. pos_string
             )
         end,
     }
@@ -4303,3 +4300,4 @@ edutest.for_all_groups = for_all_groups
 edutest.for_all_pack_items = for_all_pack_items
 edutest.for_all_item_packs = for_all_item_packs
 edutest.tracked_command_enabled = tracked_command_enabled
+edutest.apply_chatcommand = apply_chatcommand
