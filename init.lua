@@ -44,12 +44,38 @@ local apply_chatcommand = function(
     command,
     arguments
 )
-    local result, explanation = minetest.chatcommands[
+    local result
+    local explanation
+    local done = false
+    local entry = minetest.chatcommands[
         command
-    ].func(
-        player_name,
-        arguments
-    )
+    ]
+    if not entry then
+        done, result, explanation = true, false, S(
+            "unknown command @1",
+            command
+        )
+    else
+        local needed_privs = entry.privs
+        if needed_privs then
+            local allowed, missing = minetest.check_player_privs(
+                player_name,
+                needed_privs
+            )
+            if not allowed then
+                done, result, explanation = true, false, S(
+                    "missing privilege @1",
+                    missing[1]
+                )
+            end
+        end
+    end
+    if not done then
+        result, explanation = entry.func(
+            player_name,
+            arguments
+        )
+    end
     local color
     if result then
         color = "green"

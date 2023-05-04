@@ -86,3 +86,5 @@ removed @1 of item @2 from item pack @3=@1 Exemplare von @2 aus Item-Paket @3 en
 remove items from an item pack=Items aus Item-Paket entfernen
 Unfreeze a player=Spieler auftauen
 You aren't frozen anymore.=Du bist nicht mehr eingefroren.
+missing privilege @1=Fehlendes Privileg @1
+unknown command @1=unbekanntes Kommando @1
