@@ -50,10 +50,19 @@ local apply_chatcommand = function(
         player_name,
         arguments
     )
+    local color
+    if result then
+        color = "green"
+    else
+        color = "red"
+    end
     if explanation then
         minetest.chat_send_player(
             player_name,
-            "EDUtest: " .. explanation
+            minetest.colorize(
+                color,
+                "EDUtest: " .. explanation
+            )
         )
     end
     return result, explanation
