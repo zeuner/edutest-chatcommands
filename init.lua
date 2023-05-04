@@ -2735,7 +2735,6 @@ local handle_highlight_set_owner_group_mod_storage = function(
             name
         )
             apply_chatcommand(
-            minetest.chatcommands[
                 own_name,
                 "add_owner",
                 new_area_id .. " " .. name .. " " .. area
